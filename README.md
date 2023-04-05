@@ -4,15 +4,19 @@ CSCI 5117, Spring 2022, [assignment description](https://canvas.umn.edu/courses/
 
 ## App Info:
 
-* Team Name: TODO
-* App Name: TODO
+* Team Name: Code Titans
+* App Name: TBD
 * App Link: <https://TODO.com/>
 
 ### Students
 
-* First Last, x500@umn.edu
-* ...
+* Infant Derrick Gnana Susairaj, gnana014@umn.edu
+* Jeevan Prakash, praka066@umn.edu 
+* Kailash Kalyanasundaram, kalya023@umn.edu
+* Rohan Shanbhag, shanb020@umn.edu
 
+## Mock-ups
+The `low-fidelity.png` and `high-fidelity.png` are files that go over the design flow off the application for mock-up submission.
 
 ## Key Features
 

@@ -37,10 +37,16 @@ Which (if any) progressive web app feature(s) does your app support?
 
 ## Mockup images
 
-**[Add images/photos that show your mockup](https://stackoverflow.com/questions/10189356/how-to-add-screenshot-to-readmes-in-github-repository) along with a very brief caption:**
+![Low-Fidelity Diagram](mockups/high-fidelity.png)
+### Home Page
+The home page highlights the user's Monthly Expenditure, Spending Summary and any spending plans that the user might be following, also allowing them to navigate to each of these pages easily
+### Set New Plan Page
+The Set New Plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
+### Compare Plans Page
+**Todo**
 
-![](https://media.giphy.com/media/26ufnwz3wDUli7GU0/giphy.gif)
-
+![High-Fidelity Diagram](mockups/low-fidelity.png)
+Here is a high-fidelity version of our project that we also created for reference. We are not bound to this design but this may provide some guidance for us as we design our project.
 
 ## Testing Notes
 

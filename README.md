@@ -15,9 +15,6 @@ CSCI 5117, Spring 2022, [assignment description](https://canvas.umn.edu/courses/
 * Kailash Kalyanasundaram, kalya023@umn.edu
 * Rohan Shanbhag, shanb020@umn.edu
 
-## Mock-ups
-The `low-fidelity.png` and `high-fidelity.png` are files that go over the design flow off the application for mock-up submission.
-
 ## Key Features
 
 **Describe the most challenging features you implemented
@@ -37,14 +34,16 @@ Which (if any) progressive web app feature(s) does your app support?
 
 ## Mockup images
 
+### Low-Fidelity Diagram
 ![Low-Fidelity Diagram](mockups/low-fidelity.png)
-### Home Page
+#### Home Page
 The home page highlights the user's Monthly Expenditure, Spending Summary and any spending plans that the user might be following, also allowing them to navigate to each of these pages easily
-### Set New Plan Page
+#### Set New Plan Page
 The Set New Plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
-### Compare Plans Page
+#### Compare Plans Page
 **Todo**
 
+### High-Fidelity Diagram
 ![High-Fidelity Diagram](mockups/high-fidelity.png)
 Here is a high-fidelity version of our project that we also created for reference. We are not bound to this design but this may provide some guidance for us as we design our project.
 

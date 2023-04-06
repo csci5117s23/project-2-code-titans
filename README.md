@@ -41,6 +41,8 @@ The home page highlights the user's Monthly Expenditure, Spending Summary and an
 #### Set New Plan Page
 The Set New Plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
 #### Compare Plans Page
+The user will be greeted with a few pre-made budget plan suggestions, but will also be able to create and customize a unique plan depending on their specific preferences
+
 **Todo**
 
 ### High-Fidelity Diagram

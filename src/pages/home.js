@@ -1,16 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import Card from "react-bootstrap/Card";
+import {
+  Container,
+  Nav,
+  Navbar,
+  Card,
+  Row,
+  Col,
+  Button,
+  Carousel,
+} from "react-bootstrap";
 import { Bar, Doughnut } from "react-chartjs-2";
-import {  Chart, registerables } from "chart.js";
+import { Chart, registerables } from "chart.js";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
-function HomePage() {
+export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
 
@@ -144,6 +150,60 @@ function HomePage() {
     },
     maintainAspectRatio: false,
   };
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const plans = [
+    {
+      title: "Plan 1",
+      expense: 1100,
+      image1: "/autoExp.png",
+      image2: "/homeExp.png",
+    },
+    {
+      title: "Plan 2",
+      expense: 1789,
+      image1: "/otherExp.png",
+      image2: "/homeExp.png",
+    },
+    {
+      title: "Plan 3",
+      expense: 2100,
+      image1: "https://via.placeholder.com/100x100",
+      image2: "https://via.placeholder.com/100x100",
+    },
+    {
+      title: "Plan 4",
+      expense: 1400,
+      image1: "https://via.placeholder.com/100x100",
+      image2: "https://via.placeholder.com/100x100",
+    },
+    {
+      title: "Plan 5",
+      expense: 2000,
+      image1: "https://via.placeholder.com/100x100",
+      image2: "https://via.placeholder.com/100x100",
+    },
+    {
+      title: "Plan 6",
+      expense: 1800,
+      image1: "https://via.placeholder.com/100x100",
+      image2: "https://via.placeholder.com/100x100",
+    },
+    {
+      title: "Plan 7",
+      expense: 1600,
+      image1: "https://via.placeholder.com/100x100",
+      image2: "https://via.placeholder.com/100x100",
+    },
+  ];
+
+  const handlePrevClick = () => {
+    setActiveIndex(activeIndex === 0 ? plans.length - 1 : activeIndex - 1);
+  };
+
+  const handleNextClick = () => {
+    setActiveIndex(activeIndex === plans.length - 1 ? 0 : activeIndex + 1);
+  };
 
   if (!isLoaded) return <></>;
   else if (isLoaded && !userId) router.push("/");
@@ -152,7 +212,7 @@ function HomePage() {
       <>
         <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
           <Container>
-            <Navbar.Brand href="/">
+            <Navbar.Brand href="/" className="white-color">
               <strong>DuckGet</strong>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -168,11 +228,11 @@ function HomePage() {
             </Navbar.Collapse>
           </Container>
         </Navbar>
-        <Container className="my-5">
+        <Container fluid="md" className="my-5">
           <Card>
             <Card.Body>
               <div className="d-flex align-items-center">
-              <div className="title mr-auto">
+                <div className="title mr-auto">
                   <h1>Monthly Expenditure</h1>
                 </div>
                 <div className="expenses d-flex ml-auto">
@@ -180,7 +240,7 @@ function HomePage() {
                   <img src="/addExpenseBox.png" alt="Expenses" />
                 </div>
               </div>
-              <div className="my-5" >
+              <div className="my-5">
                 <Bar data={data} options={options} />
               </div>
             </Card.Body>
@@ -189,24 +249,139 @@ function HomePage() {
         <Container className="my-5">
           <Card>
             <Card.Body>
-            <div className="title mr-auto">
-                  <h1>Spending Summary</h1>
-                </div>
+              <div className="title mr-auto">
+                <h1>Spending Summary</h1>
+              </div>
               <div className="mb-4">
                 <h6 className="font-italic">{`${new Date().toLocaleString(
                   "default",
                   { month: "long" }
                 )} ${new Date().getFullYear()}`}</h6>
               </div>
-              <div className="my-5 mx-auto" style={{maxWidth: '500px'}}>
+              <div className="my-5 mx-auto" style={{ maxWidth: "500px" }}>
                 <Doughnut data={donutdata} options={donutoptions} />
               </div>
             </Card.Body>
           </Card>
         </Container>
+        <Container className="my-5">
+          <h2 className="white-color">Your Plans</h2>
+          <Carousel
+            activeIndex={activeIndex}
+            onSelect={(selectedIndex) => setActiveIndex(selectedIndex)}
+            interval={null}
+            slide={2} // Set number of cards displayed to 2
+          >
+            {plans.reduce((acc, plan, index) => {
+              if (index % 2 === 0) {
+                acc.push(
+                  <Carousel.Item key={index}>
+                    <Row className="mt-3 justify-content-center">
+                      <Col sm={6} md={4} lg={4} className="mb-3">
+                        <Card>
+                          <Card.Body>
+                            <Card.Title className="title">
+                              {plans[index].title}
+                            </Card.Title>
+                            <h3 className="text-success">
+                              ${plans[index].expense}
+                            </h3>
+                            <div className="d-flex justify-content-center">
+                              <div className="m-auto">
+                                <img
+                                  width="100px"
+                                  height="100px"
+                                  src={plans[index].image1}
+                                  alt="Image 1"
+                                />
+                              </div>
+                              <div className="m-auto">
+                                <img
+                                  width="100px"
+                                  height="100px"
+                                  src={plans[index].image2}
+                                  alt="Image 2"
+                                />
+                              </div>
+                            </div>
+                            <div className="d-flex m-3">
+                              <Button
+                                variant="primary"
+                                className="m-auto main-button p-2"
+                              >
+                                View
+                              </Button>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      {index + 1 < plans.length && (
+                        <Col sm={6} md={4} lg={4} className="mb-3">
+                          <Card>
+                            <Card.Body>
+                              <Card.Title className="title">
+                                {plans[index + 1].title}
+                              </Card.Title>
+                              <h3 className="text-success">
+                                ${plans[index + 1].expense}
+                              </h3>
+                              <div className="d-flex justify-content-center">
+                                <div className="m-auto">
+                                  <img
+                                    width="100px"
+                                    height="100px"
+                                    src={plans[index + 1].image1}
+                                    alt="Image 1"
+                                  />
+                                </div>
+                                <div className="m-auto">
+                                  <img
+                                    width="100px"
+                                    height="100px"
+                                    src={plans[index + 1].image2}
+                                    alt="Image 2"
+                                  />
+                                </div>
+                              </div>
+                              <div className="d-flex m-3">
+                                <Button
+                                  variant="primary"
+                                  className="m-auto main-button p-2"
+                                >
+                                  View
+                                </Button>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      )}
+                    </Row>
+                  </Carousel.Item>
+                );
+              }
+              return acc;
+            }, [])}
+          </Carousel>
+          <div className="d-flex justify-content-center mt-3">
+            <Button
+              variant="light"
+              className="mr-2"
+              onClick={handlePrevClick}
+              disabled={activeIndex === 0}
+            >
+              <FaAngleLeft />
+            </Button>
+            <Button
+              variant="light"
+              className="ml-2"
+              onClick={handleNextClick}
+              disabled={activeIndex === Math.floor((plans.length - 1) / 2)}
+            >
+              <FaAngleRight />
+            </Button>
+          </div>
+        </Container>
       </>
     );
   }
 }
-
-export default HomePage;

@@ -2,7 +2,7 @@ html, body{
   background-color: #FFB84E !important;
 
 }
-nav span{
+.white-color{
   color: #F8F4F1 !important;
 }
 strong{
@@ -21,4 +21,9 @@ strong{
 
 .expenses img {
   margin-left: 1rem;
+}
+.main-button {
+  background-color: rgba(71, 177, 237, 0.87) !important;
+  border: rgba(71, 177, 237, 0.87) !important;
+  width: 80%;
 }

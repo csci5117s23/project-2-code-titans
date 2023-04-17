@@ -8,6 +8,14 @@ import { useRouter } from "next/router";
 
 
 export default function Home() {
+  const { isLoaded, userId, sessionId, getToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  useEffect(() => {
+    setIsLoading(!isLoaded)
+  }, [isLoaded])
+  
+  if(userId) router.push("/home");
   return (
     <>
       <Head>
@@ -20,7 +28,7 @@ export default function Home() {
           className="container-fluid d-flex justify-content-center align-items-center"
           style={{ height: "100vh" }}
         >
-          <Card className="p-5">
+          <Card className="p-5 rounded-5">
             <Card.Img
               variant="top"
               src="/duckget-logo.png"

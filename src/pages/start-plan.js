@@ -1,13 +1,15 @@
 import React, { useState } from "react";
+import {useAuth, useUser } from "@clerk/nextjs";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Form } from "react-bootstrap";
-
+import Navigation from "@/components/Navigation";
 export default function StartNew() {
   const [location, setLocation] = useState(null);
   const [zipCode, setZipCode] = useState(null);
   const [totalSalesTax, setTotalSalesTax] = useState(null);
   const apiNinjaKey = 'VUqM8pOYRSUXDglRoav+Vg==EuvtIuMkwpPN0t9r';
-
+  const { isLoaded, userId, sessionId, getToken } = useAuth();
+  const { user } = useUser();
   const getLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -77,8 +79,12 @@ export default function StartNew() {
       })
     );
   };
-
+  if (!isLoaded) return <></>;
+  else if (isLoaded && !userId) router.push("/");
+  else {
   return (
+    <>
+    <Navigation/>
     <Container>
       <Form onSubmit={handleZipCodeSubmit}>
         <Form.Group controlId="zipCodeInput">
@@ -119,5 +125,7 @@ export default function StartNew() {
         <p>Sales Tax: {totalSalesTax}</p>
       )}
     </Container>
+    </>
   );
+  }
 }

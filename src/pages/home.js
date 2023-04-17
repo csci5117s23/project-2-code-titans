@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserButton, useAuth, useUser } from "@clerk/nextjs";
+import {useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
@@ -15,6 +15,7 @@ import {
 import { Bar, Doughnut } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import Navigation from "@/components/Navigation";
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -210,26 +211,9 @@ export default function HomePage() {
   else {
     return (
       <>
-        <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
-          <Container>
-            <Navbar.Brand href="/" className="white-color">
-              <strong>DuckGet</strong>
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-            <Navbar.Collapse id="responsive-navbar-nav">
-              <Nav className="me-auto">
-                <Nav.Link href="/start-plan">Start New Plan</Nav.Link>
-                <Nav.Link href="/current-plans">My Current Plans</Nav.Link>
-                <Nav.Link href="/detailed-view">Detailed View</Nav.Link>
-              </Nav>
-              <Nav>
-                <UserButton />
-              </Nav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
+        <Navigation></Navigation>
         <Container fluid="md" className="my-5">
-          <Card>
+          <Card className="rounded-4">
             <Card.Body>
               <div className="d-flex align-items-center">
                 <div className="title mr-auto">
@@ -247,7 +231,7 @@ export default function HomePage() {
           </Card>
         </Container>
         <Container className="my-5">
-          <Card>
+          <Card className="rounded-4">
             <Card.Body>
               <div className="title mr-auto">
                 <h1>Spending Summary</h1>
@@ -278,7 +262,7 @@ export default function HomePage() {
                   <Carousel.Item key={index}>
                     <Row className="mt-3 justify-content-center">
                       <Col sm={6} md={4} lg={4} className="mb-3">
-                        <Card>
+                        <Card className="rounded-4">
                           <Card.Body>
                             <Card.Title className="title">
                               {plans[index].title}
@@ -317,7 +301,7 @@ export default function HomePage() {
                       </Col>
                       {index + 1 < plans.length && (
                         <Col sm={6} md={4} lg={4} className="mb-3">
-                          <Card>
+                          <Card className="rounded-4">
                             <Card.Body>
                               <Card.Title className="title">
                                 {plans[index + 1].title}

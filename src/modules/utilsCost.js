@@ -6,6 +6,13 @@ const apiNinjaKey = 'VUqM8pOYRSUXDglRoav+Vg==EuvtIuMkwpPN0t9r';
 export default function CostCalculator(){
     const [loanAmt,setLoanAmt] = useState("Click to get your loan amount!");
     const [taxRate,setTaxRate] = useState("Click to get your tax rate!");
+    const [carMake,setCarMake] = useState("Enter your VIN and find the Manufacturer!");
+    const [carPrice,setCarPrice] = useState("Click to get your estimated car price!");
+
+    const [carYear,setCarYear] = useState(null);
+    const [carModel,setCarModel] = useState(null);
+    const [carVIN,setCarVIN] = useState(null);
+
     const { isLoaded, userId, isSignedIn, getToken } = useAuth();
 
     // useEffect(() => {}, [isLoaded,loanAmt])
@@ -24,12 +31,33 @@ export default function CostCalculator(){
         return taxRate;
     }
 
+    // Yennodu VIN L5YZCABP1N1146187
+    async function getCarManufacturer(VIN){
+        console.log("getCarManufacturer function reached");
+        setCarVIN(VIN);
+        setCarMake(await getCarMake(VIN));
+        setCarYear(await getCarYear(VIN));
+        setCarModel(await getCarModel(VIN));
+        return carMake;
+    }
+
+    async function getCarPriceEstimate(carMake,carYear,carModel){
+        console.log("getCarPriceEstimate function reached");
+        setCarPrice(await getCarPrice(carMake,carYear,carModel));
+        return carPrice;
+    }
+
     return (
         <>
             <h3>Loan amount payable per month:</h3><br></br>
             <button onClick={getValues}>{loanAmt}</button>
             <h3>Total tax Rate for your zip code:</h3>
             <button onClick={getZipTax}>{taxRate}</button>
+            <h3>Get Car Make:</h3>
+            <textarea placeholder="Enter your VIN" onChange={(e) => getCarManufacturer(e.target.value)}></textarea>
+            <h5>{carMake}</h5>
+            <h3>Get Car Price:</h3>
+            <button onClick={async () => {getCarPriceEstimate(carMake,carYear,carModel)}}>{carPrice}</button>
         </>
     );
 }
@@ -60,3 +88,54 @@ async function getTotalTaxRate(zip){
 //     return response;
 // }
 
+//Getting the manufacturer/make of the car (i.e. Acura, Buick etc.)
+async function getCarMake(VIN){
+    const api_url = `https://api.api-ninjas.com/v1/vinlookup?vin=${VIN}`;
+    const response = await fetch(api_url, {headers: {
+        "X-Api-Key": apiNinjaKey
+      }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: "); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
+    return response;
+}
+
+//Getting the year the car was made (i.e. 2015, 2022 etc.)
+async function getCarYear(VIN){
+    const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+    const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[10].Value"); console.log(data.Results[10].Value); return data.Results[10].Value;}).catch(error => console.error(error));
+    return response;
+}
+
+async function getCarPrice(carMake,carYear,carModel){
+    console.log("CarYear: " + carYear);
+    const response = await fetch("/cars.txt");
+    const data = await response.text();
+    const lines = data.split("\n");
+
+    let avgPrice = 0;
+    let carPriceSum = 0;
+    let numCars = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const [id,price,year,mileage,city,state,vin,make,model] = lines[i].split(",");
+      if(make == carMake && model.includes(carModel) && year == carYear){
+        numCars++;
+        carPriceSum += parseInt(price);
+      }
+    }
+    console.log("Type of carYear: " + typeof(carYear));
+    console.log("All " + carYear + " " + carMake + " " + carModel + " prices total to: " + carPriceSum);
+    console.log("Total number of cars: " + numCars);
+    // let sampleModel = "TL4dr";
+    // console.log("Sample model (TL4dr) includes TL?: " + sampleModel.includes("TL"));
+    
+    avgPrice = carPriceSum / numCars;
+    
+    console.log("Average Price: " + avgPrice);
+
+    return avgPrice;
+}
+
+async function getCarModel(VIN){
+    const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+    const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
+    return response;
+}

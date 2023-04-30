@@ -39,9 +39,11 @@ export default function PlansPage() {
                     <link rel="icon" href="/duckget-logo.png" />
                 </Head>
                 <Navigation/>
-                <ul className="place-items-center items-center self-center">
+                <Container className="mx-auto">
                     {planList}
-                </ul>
+                    {/* <ul className="place-items-center items-center self-center">
+                    </ul> */}
+                </Container>
             </>
         )
     }

@@ -46,8 +46,8 @@ export default function Navigation() {
     <>
     <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
           <Container>
-            <Navbar.Brand href="/" className="white-color">
-              <strong>DuckGet</strong>
+            <Navbar.Brand className="white-color">
+              <Link href="/"><strong>DuckGet</strong></Link>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">

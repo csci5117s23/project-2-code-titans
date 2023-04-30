@@ -14,14 +14,16 @@ export default function Navigation(){
 
   useEffect(() => {
     console.log("Use Effect Works!")
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log("HI")
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
-      setInstallable(true);
+    window.addEventListener("beforeinstallprompt", (beforeInstallPromptEvent) => {
+      beforeInstallPromptEvent.preventDefault(); // Prevents immediate prompt display
+      console.log("Listener works!")
+      // Shows prompt after a user clicks an "install" button
+      installButton.addEventListener("click", (mouseEvent) => {
+        // you should not use the MouseEvent here, obviously
+        beforeInstallPromptEvent.prompt();
+      });
+    
+      installButton.hidden = false; // Make button operable
     });
   }, []);
 
@@ -54,13 +56,14 @@ export default function Navigation(){
                 <Nav.Link href="/start-plan">Start New Plan</Nav.Link>
                 <Nav.Link href="/current-plans">My Current Plans</Nav.Link>
                 <Nav.Link href="/detailed-view">Detailed View</Nav.Link>
+                <link rel="manifest" href="/manifest.json"></link>
               </Nav>
               <Nav>
                 <UserButton />
               </Nav>
               <Nav>
               {installable &&
-          <Button variant='primary' className="install-button" onClick={handleInstallClick}>
+          <Button variant='primary' className="installButton" onClick={handleInstallClick}>
           INSTALL ME
         </Button>
         }

@@ -13,7 +13,7 @@ export default function Navigation(){
   const [installable, setInstallable] = useState(false);
 
   useEffect(() => {
-    console.log("Use Effect Works!")
+    console.log("Use Effect")
     window.addEventListener("beforeinstallprompt", (beforeInstallPromptEvent) => {
       beforeInstallPromptEvent.preventDefault(); // Prevents immediate prompt display
       console.log("Listener works!")

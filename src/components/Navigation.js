@@ -7,9 +7,10 @@ import {
   Navbar,
   Button
 } from "react-bootstrap";
+import Link from "next/link";
 
 let deferredPrompt
-export default function Navigation(){
+export default function Navigation() {
   const [installable, setInstallable] = useState(false);
 
   useEffect(() => {
@@ -51,9 +52,9 @@ export default function Navigation(){
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="me-auto">
-                <Nav.Link href="/start-plan">Start New Plan</Nav.Link>
-                <Nav.Link href="/current-plans">My Current Plans</Nav.Link>
-                <Nav.Link href="/detailed-view">Detailed View</Nav.Link>
+                <Link href="/start-plan">Start New Plan</Link>
+                <Link href="/plans">My Current Plans</Link>
+                <Link href="/detailed-view">Detailed View</Link>
               </Nav>
               <Nav>
                 <UserButton />

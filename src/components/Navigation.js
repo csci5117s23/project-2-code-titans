@@ -7,10 +7,13 @@ import {
   Navbar,
   Button
 } from "react-bootstrap";
+
+let deferredPrompt
 export default function Navigation(){
   const [installable, setInstallable] = useState(false);
 
   useEffect(() => {
+    console.log("Use Effect Works!")
     window.addEventListener('beforeinstallprompt', (e) => {
       console.log("HI")
       // Prevent the mini-infobar from appearing on mobile

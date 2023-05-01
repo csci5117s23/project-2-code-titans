@@ -79,6 +79,14 @@ const filename = 'cars.txt';
 
 const bucketName = 'car_info';
 
+const secondFilename = 'avgHomeInsuranceCosts.txt';
+
+const secondBucketName = 'housing_stuff';
+
+// const thirdFilename = 
+
+// const thirdBucketName = 'location_stuff';
+
 
 
 async function getAcuras(carMake,carYear,carModel){
@@ -128,15 +136,37 @@ export async function getCarInfo(authToken,userId,carMake,carYear,carModel) {
   return await result.json();
 }
 
-app.get('/carPage', async (req, res) => {
-  console.log("Woo PongaloPongal");
+async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
+  const file = storage.bucket(secondBucketName).file(secondFilename);
+  const contents = await file.download();
+
+  // const resp = contents;
+  // const data = resp[0].toString();
+  // const lines = data.split("\n");
+
+  const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
+  const response = await fetch(api_url, {headers: {
+      "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
+  return response;
+}
+
+// Totalcost, downpayment, APR, loan term
+app.get('/getHomePrice', async (req, res) => {
+  getLoanPayables(req.query.amt,req.query.interestRate,req.query.duration,req.query.homeInsurance,req.query.propertyTax);
+})
+
+app.get('/calculateCarPrice', async (req, res) => {
+  console.log("In /carPage");
+  const db = await Datastore.open();
+  const data = await db.replaceOne('plans',req.query._id,req.body);
 
   res.send((await getAcuras("Acura","2014","TL")).toString());
 });
 
 // app.use(getAcuras);
 // Use Crudlify to create a REST API for any collection
-crudlify(app)
+crudlify(app, {plans: PlanYup, plannedExpenses: PlannedExpenseYup, pastExpenses: PastExpenseYup})
 
 // bind to serverless runtime
 export default app.init();

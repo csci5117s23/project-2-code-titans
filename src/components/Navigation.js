@@ -47,14 +47,14 @@ export default function Navigation() {
     <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
           <Container>
             <Navbar.Brand className="white-color">
-              <Link href="/"><strong>DuckGet</strong></Link>
+              <Link className="nav-link" href="/"><strong>DuckGet</strong></Link>
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav className="me-auto">
-                <Link href="/start-plan">Start New Plan</Link>
-                <Link href="/plans">My Current Plans</Link>
-                <Link href="/detailed-view">Detailed View</Link>x
+                <Link className="nav-link" href="/start-plan">Start New Plan</Link>
+                <Link className="nav-link" href="/plans">My Current Plans</Link>
+                <Link className="nav-link" href="/detailed-view">Detailed View</Link>
               </Nav>
               <Nav>
                 <UserButton />

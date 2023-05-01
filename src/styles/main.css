@@ -27,3 +27,21 @@ strong{
   border: rgba(71, 177, 237, 0.87) !important;
   width: 80%;
 }
+.chart-container {
+  width: 100%;
+  height: 200px;
+}
+.text-success{
+  color: #044303 !important;
+}
+.white-box-container{
+  border-bottom-left-radius: 48px !important;
+  border-bottom-right-radius: 48px !important;
+  background: #F8F4F1;
+  box-shadow: 0px 4px 39px rgba(0, 0, 0, 0.15);
+  width: 100%;
+}
+.btn-save {
+  display: block;
+  margin: 0 auto;
+}

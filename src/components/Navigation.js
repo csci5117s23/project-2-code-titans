@@ -1,11 +1,15 @@
 import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState, useEffect } from 'react';
 import { UserButton } from "@clerk/nextjs"
 import {
   Container,
   Nav,
-  Navbar
+  Navbar,
+  Button
 } from "react-bootstrap";
+
 export default function Navigation(){
+
   return (
     <>
     <Navbar collapseOnSelect expand="lg" bg="transparent" variant="dark">
@@ -19,6 +23,7 @@ export default function Navigation(){
                 <Nav.Link href="/start-plan">Start New Plan</Nav.Link>
                 <Nav.Link href="/current-plans">My Current Plans</Nav.Link>
                 <Nav.Link href="/detailed-view">Detailed View</Nav.Link>
+                <link rel="manifest" href="/manifest.json"></link>
               </Nav>
               <Nav>
                 <UserButton />

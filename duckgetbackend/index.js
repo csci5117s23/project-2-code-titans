@@ -136,7 +136,7 @@ app.get('/carPage', async (req, res) => {
 
 // app.use(getAcuras);
 // Use Crudlify to create a REST API for any collection
-crudlify(app)
+crudlify(app, {plans: PlanYup, plannedExpenses: PlannedExpenseYup, pastExpenses: PastExpenseYup})
 
 // bind to serverless runtime
 export default app.init();

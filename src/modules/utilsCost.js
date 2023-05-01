@@ -16,19 +16,21 @@ export default function CostCalculator(){
     const [principal,setPrincipal] = useState(0);
     const [intRate,setIntRate] = useState(0);
     const [loanDuration,setLoanDuration] = useState(0);
+    const [rentAmount,setRentAmount] = useState("Click to get your monthly apartment rent");
 
-    const [zipcode,setZipcode] = useState(null);
     const [state,setState] = useState("Click to find your state!");
+    const [zipcode,setZipcode] = useState(null);
     const [avgHomeInsuranceCost,setAvgHomeInsuranceCost] = useState(0);
+    const [curPropertyTax,setCurPropertyTax] = useState(0);
+    const [avgRentersInsurance,setAvgRentersInsurance] = useState(0);
 
     const { isLoaded, userId, isSignedIn, getToken } = useAuth();
 
-    // useEffect(() => {}, [isLoaded,loanAmt])
+    // useEffect(() => {}, [isLoaded,state]);
 
-    async function getValues(principal,intRate,loanDuration,avgHomeInsurance){
+    async function getValues(principal,intRate,loanDuration,avgHomeInsurance,propertyTax){
         console.log("getValues function reached");
-        // setLoanAmt(calcCost.getLoanPayables(200000,3.5,30));
-        setLoanAmt(await getLoanPayables(principal,intRate,loanDuration,avgHomeInsurance));
+        getLoanPayables(principal,intRate,loanDuration,avgHomeInsurance,propertyTax).then((res) => setLoanAmt(res));
         return loanAmt;
     }
     
@@ -51,8 +53,19 @@ export default function CostCalculator(){
 
     async function getStateOfZipCode(zip){
         console.log("getStateOfZipcode function reached");
-        setState(await getStateByZip(zip));
-        setAvgHomeInsuranceCost(await getAvgHomeInsuranceCost(state));
+        console.log("Zipcode: " + zip);
+        getStateByZip(zip).then((derState) => {
+            getAvgHomeInsuranceCost(derState).then((res) => {
+                setAvgHomeInsuranceCost(res[0]);
+                setCurPropertyTax(res[1]);
+                setAvgRentersInsurance(res[2]);
+                setState(derState);
+            });
+        })
+        // const res = (await getAvgHomeInsuranceCost(state)).then((data) => {setAvgHomeInsuranceCost(data[0]); setCurPropertyTax(data[1]);});
+        // setAvgHomeInsuranceCost(res[0]);
+        // setCurPropertyTax(res[1]);
+        
         return state;
     }
 
@@ -67,11 +80,14 @@ export default function CostCalculator(){
             <h3>Enter your zipcode to find the state</h3>
             <textarea placeholder="Enter 5 digit zipcode" onChange={(e) => setZipcode(e.target.value)}></textarea>
             <button onClick={async () => getStateOfZipCode(zipcode)}>{state}</button>
-            <h3>Loan amount payable per month:</h3><br></br>
+            <h3>House Loan amount payable per month:</h3><br></br>
             <textarea placeholder="Enter your house loan amount" onChange={(e) => setPrincipal(e.target.value)}></textarea>
             <textarea placeholder="Enter the (%) interest rate on your loan" onChange={(e) => setIntRate(e.target.value)}></textarea>
             <textarea placeholder="Enter the duration of the loan period" onChange={(e) => setLoanDuration(e.target.value)}></textarea>
-            <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost)}>{loanAmt}</button>
+            <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost * principal,curPropertyTax * principal)}>{loanAmt}</button>
+            <h3>Rent amount payable per month:</h3>
+            <textarea placeholder="Enter monthly rent payment" onChange={(e) => setRentAmount(e.target.value)}></textarea>
+            <button onClick={async () => getValues(rentAmount * 12,0.1,1,avgRentersInsurance,0)}>{loanAmt}</button>
             <h3>Total tax Rate for your zip code:</h3>
             <button onClick={getZipTax}>{taxRate}</button>
             <h3>Get Car Make:</h3>
@@ -91,8 +107,8 @@ async function getStateByZip(zip){
     return response;
 }
 
-async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance){
-    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}`;
+async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
+    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
     const response = await fetch(api_url, {headers: {
         "X-Api-Key": apiNinjaKey
       }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
@@ -174,16 +190,22 @@ async function getAvgHomeInsuranceCost(state){
     const data = await response.text();
     const lines = data.split("\n");
 
-    let avgCost = 0;
+    let avgCostPercent = 0;
+    let propertyTaxPercent = 0;
+    let rentInsurance = 0;
 
     for (let i = 0; i < lines.length; i++) {
-      const [stateAbbr,cost] = lines[i].split(",");
+      const [stateAbbr,cost,propertyTax,rentersInsurance] = lines[i].split(",");
       if(stateAbbr == state){
-        avgCost = cost;
+        avgCostPercent = (cost / 250000);
+        propertyTaxPercent = propertyTax;
+        rentInsurance = rentersInsurance;
       }
     }
     
-    console.log("Average Insurance cost for " + state + ": " + avgCost);
+    console.log("Average Insurance cost (%) for " + state + ": " + avgCostPercent);
+    console.log("Property tax (%): " + propertyTaxPercent);
+    console.log("Renters insurance: " + rentInsurance);
 
-    return avgCost;
+    return [avgCostPercent,propertyTaxPercent,rentInsurance];
 }

@@ -248,7 +248,6 @@ export default function HomePage() {
             </Card.Body>
           </Card>
         </Container>
-        <link rel="manifest" href="/manifest.json"></link>
         <Container className="my-5">
           <h2 className="white-color">Your Plans</h2>
           <Carousel

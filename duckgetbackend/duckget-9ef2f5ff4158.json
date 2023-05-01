@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "duckget",
+  "private_key_id": "9ef2f5ff415880d9457f699d4c21cab11e51b998",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCPJawOLUvHtzOm\n7vLhuJ1Cv+WMc5l7yTiXovboKFE4R7J4D9rbNO1WIQH+Gv+KhR9m1mqC6/+sc4CQ\nGxoQ89FxNsE0CxVRo5+4xvsQs51b4og/eECq8MGp8Srvmw8phq15obm3rQKsk+60\nTC+h/VoHYyDAp9sLibK3Pgqs41f+WaYaFY+glS3mvxeciRuzO5dwTYcmCqkVE+GE\nF7LpI627YfZUFX7BFui7sx5BpRc+Sti9KEbu9sJ0q1AdyOeaaOAb/y6iYH8W90MO\npZ27MxzbBgdEizN/+TXkfdOAtjpsnyh/MLvilTWoD/zgNlNnetJEpaWwZK3xOw1W\nd9JCRHMVAgMBAAECggEAHhz/8rSLME6lLk0uqZbveEMLvG32IBEO13F4LRMMMQF+\nNR0qvnoGIpwLggP2dZK3LihVnEiezs22gjo9U8si6ITrBHJ/b97ywwmS9+q9I/8G\nCAoZWoyOxRwfmuu89xCmrkN8IPxjp1/wc5viWlrEhXDQS08UeLslLkC+OKwTzwUG\n54GOtJVn4jA5Isg5MDjHPPiPOgSXzexJCb6JTbG4+z2ZS20/2EmVIqsEN78hPUAG\nj0NBqLFrAfj2rZ/niPyqnTh7ljH9Q1oYy5MKM3Bnh4jNVESmd2kkZmvBxgITeiX3\n+K2gZoYNUpLH5kxms1yXrnMs2c5fdv42y3e9FJvASQKBgQDEZNavk7QKXigZNYHx\n5fTiNoMrtLR6Fo/gTDeE/QHQ9Ua2JdHqwEN4rQ/uqmQBmxg84NgqFgg36OTluMiW\nNsuVPDNwDRgpobF6rZ4klxT0Uh+28BhlfGLHRruQwDT5v0hhZVRJ1JHje9Erx4df\nPXK4tkCY3PyImycK2pSbe2jviQKBgQC6l7x6bmihJxf5ZLuUnlS0Z3Mb82TnBt6s\n/HIXFowIvE9fOhPQlRtAxuiwq339WO/no13ZqHPYg0MMsPtzMyfyVjg8HM7xU1KV\nQIE6C6gLWvzGZY9MaLW/MEyHIpF2mJSRKBnz0Eq/brk4n7jm4f5/xBtfsDXq4oqS\n6CHfZpGYLQKBgEfnz77LKoEdRjssnx4tHsLwSIhpCiclOZpa7XzwkYirNS+dm0UD\nDfESFCJDGoiH+5DWle6a0Hl/+MavKCnveAx01TRyZuVfQTb0eFFXS6HEq730HEqU\nByqFGEmARiUmxt56FilN/fg3LjeEP2k8e1NrzyzoxEFT5TCRJRXkUmBZAoGAavGw\nyxMg0MyRRxVfFa0xqzxnkyuLN4aOdeMymN0JYbBcZZ3p4XC0cAoRL8D6swwYZFET\n5z5PN1b0RP/i/oHhcVnNXVa9nT8+Y+DWsCgiJm/91NA8s3SIRo4uLn23lZuZ+yBa\nz40galvRuQyCc4Iv1ZbWgZ+DJ560AcMeNuaYp/kCgYBS21UwymSp1KwyGMrV2qJi\nzBRS1Xpt3nNsOsWncnOREIdZ7wzhVN24r93XBGJuC70MN3BHnqAEhi+z2MsY2olX\nCDuglXORGKNNZVjH6gNngqRy2WMHzxDj1muo4jbEGzKlWf7HbYbQVD5iIp9C3VEi\noVOVy3vPb9Sr+F7Aaow+Og==\n-----END PRIVATE KEY-----\n",
+  "client_email": "duckgetbackend@duckget.iam.gserviceaccount.com",
+  "client_id": "106203557928817560558",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/duckgetbackend%40duckget.iam.gserviceaccount.com"
+}

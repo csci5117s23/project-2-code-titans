@@ -54,17 +54,10 @@ export default function Navigation() {
               <Nav className="me-auto">
                 <Link href="/start-plan">Start New Plan</Link>
                 <Link href="/plans">My Current Plans</Link>
-                <Link href="/detailed-view">Detailed View</Link>
+                <Link href="/detailed-view">Detailed View</Link>x
               </Nav>
               <Nav>
                 <UserButton />
-              </Nav>
-              <Nav>
-              {installable &&
-          <Button variant='primary' className="install-button" onClick={handleInstallClick}>
-          INSTALL ME
-        </Button>
-        }
               </Nav>
             </Navbar.Collapse>
           </Container>

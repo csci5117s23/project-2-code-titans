@@ -71,7 +71,7 @@ along with a very brief caption:**
 **Document integrations with 3rd Party code or services here.
 Please do not document required libraries (e.g., Vue, Vuefire, Firebase).**
 
-* Library or service name: description of use
+* GCP: For Car API data storage
 * ...
 
 **If there's anything else you would like to disclose about how your project

@@ -20,7 +20,15 @@ const PlannedExpenseYup = object({
   userId: string().required(),
   amount: number().required().positive(), // need to do a check at the frontend for whether the expense is at least $0.01
   planId: string().required(),
-  dueDate: date().required().min(new Date()) // the date of the planned expense cannot be before today
+  dueDate: date().required().min(new Date()), // the date of the planned expense cannot be before today
+  l: string().optional(),
+  carModel: string().optional(),
+  carMake: string().optional(),
+  carYear: date().optional(),
+  carVin: string().optional(),
+  apr: number().optional(),
+  term: number().optional(),
+  downPayment: number().optional()
 })
 
 const PastExpenseYup = object({
@@ -162,6 +170,42 @@ app.get('/calculateCarPrice', async (req, res) => {
   const data = await db.replaceOne('plans',req.query._id,req.body);
 
   res.send((await getAcuras("Acura","2014","TL")).toString());
+});
+
+app.delete('/deletePlan', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.removeOne('plans',req.query._id);
+  res.json(data);
+});
+
+app.delete('/deletePlanned', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.removeOne('plannedExpenses',req.query._id);
+  res.json(data);
+});
+
+app.delete('/deletePast', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.removeOne('pastExpenses',req.query._id);
+  res.json(data);
+});
+
+app.put('/updatePlan', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.updateOne('plans',req.query._id, req.body);
+  res.json(data);
+});
+
+app.put('/updatePlannedExpense', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.updateOne('plannedExpenses',req.query._id, req.body);
+  res.json(data);
+});
+
+app.put('/updatePastExpense', async (req, res) => {
+  const db = await Datastore.open();
+  const data = await db.updateOne('pastExpenses',req.query._id, req.body);
+  res.json(data);
 });
 
 // app.use(getAcuras);

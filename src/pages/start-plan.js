@@ -78,6 +78,22 @@ export default function NewPlanPage() {
                       borderRadius: "11px",
                     }}
                   />
+                  <Form.Label><span className="light-brown">Projected Yearly Income</span></Form.Label>
+                  <Form.Control
+                    type="text"
+                    style={{
+                      background: "#F7E7D5",
+                      borderRadius: "11px",
+                    }}
+                  />
+                  <Form.Label><span className="light-brown">Location</span></Form.Label>
+                  <Form.Control
+                    type="text"
+                    style={{
+                      background: "#F7E7D5",
+                      borderRadius: "11px",
+                    }}
+                  />
                 </Form.Group>
               </Col>
             </Row>
@@ -91,27 +107,26 @@ export default function NewPlanPage() {
                 <img
                   src="/auto.png"
                   alt="Auto"
-                  className="img-fluid mr-3"
+                  className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("Auto")}
                 />
                 <img
                   src="/home.png"
                   alt="Home"
-                  className="img-fluid mr-3"
+                  className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("Home")}
                 />
                 <img
                   src="/other.png"
                   alt="Other"
-                  className="img-fluid"
+                  className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("other")}
                 />
               </Col>
             </Row>
-            {/* Your form components would go here */}
           </div>
         </Container>
         <div className="p-3 text-center">

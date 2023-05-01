@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { getAllPlans } from "@/modules/Data";
 import {
   Container,
   Nav,
@@ -10,6 +11,7 @@ import {
   Col,
   Button,
 } from "react-bootstrap";
+import { addPlan } from "@/modules/Data";
 import Navigation from "@/components/Navigation";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -17,18 +19,20 @@ import PlanCard from "@/components/PlanCard";
 
 export default function PlansPage() {
   const [plans, setNewPlans] = useState([
-    "yuh",
-    "nah",
-    "fam",
-    "bruh",
-    "what",
-    "are",
-    "you",
-    "doing",
   ]);
 
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    getToken({ template: "codehooks" }).then(async (token) => {
+      const res =  await getAllPlans(token, userId);
+      console.log("res: " + res.length)
+      if(res.length > 0)
+        setNewPlans(res);
+    });
+  }, [router, isLoaded])
+
 
   if (!isLoaded) return <></>;
   else if (isLoaded && !userId) router.push("/");
@@ -36,9 +40,10 @@ export default function PlansPage() {
     const planList = plans.map((plan) => (
       <Col xs={12} lg={4}>
         <PlanCard
-          name={plan}
+          name={plan.name}
           expenditure={5}
           summaryData={"yeah and?"}
+          id={plan._id}
           activeStatus={false}
         />
       </Col>
@@ -65,6 +70,11 @@ export default function PlansPage() {
                 border: "none",
                 boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
                 marginBottom: "10px",
+              }}
+              onClick={async () => {
+                const token = await getToken({ template: "codehooks" });
+                const res = await addPlan(token, {name: 'fake', userId: userId, location: '00000', isActive: false});
+                router.push('/plans/' + res._id);
               }}
             >
               <h1>New Plan</h1>

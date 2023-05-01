@@ -4,8 +4,8 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Duckget App",
-    "short_name": "Duckget",
+    "name": "DuckGet App",
+    "short_name": "DuckGet",
     "description": "Project 2 Code Titans",
     "icons": [
         {

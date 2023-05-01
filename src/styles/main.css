@@ -49,3 +49,7 @@ strong{
   color: #876C44;
   font-size: 20px;
 }
+.custom-input {
+  background: "#F7E7D5";
+  border-radius: "11px";
+}

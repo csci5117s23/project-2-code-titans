@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Doughnut } from "react-chartjs-2";
 import "chart.js/auto";
 import { Chart, registerables } from "chart.js";
+import { useRouter } from "next/router";
 import {
   Container,
   Nav,
@@ -13,8 +14,9 @@ import {
   Button,
 } from "react-bootstrap";
 
-export default function PlanCard({name,expenditure,summaryData,activeStatus}) {
+export default function PlanCard({name,expenditure,summaryData,activeStatus, id}) {
     Chart.register(...registerables);
+    const router = useRouter();
     const data = {
         labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
         datasets: [
@@ -69,6 +71,7 @@ export default function PlanCard({name,expenditure,summaryData,activeStatus}) {
           <Button
             variant="link"
             className="mt-3 ml-2"
+            onClick={() => router.push('/plans/' + id)}
           >
             <img
             src="/expand.png"

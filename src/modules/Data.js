@@ -73,7 +73,7 @@ export async function getSinglePastExpense(authToken, userId, pastExpenseId) {
 }
 
 export async function addPlan(authToken, plan) {
-    const result = await fetch(`${backend_base}/plans`, {
+    const result = await fetch(`${backendBase}/plans`, {
         'method': 'POST',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -81,23 +81,13 @@ export async function addPlan(authToken, plan) {
         },
         'body': JSON.stringify(plan)
     })
-    return result;
+    return await result.json();
 }
 
-export async function addPlan(authToken, plan) {
-    const result = await fetch(`${backend_base}/plans`, {
-        'method': 'POST',
-        'headers': {
-            'Authorization': 'Bearer ' + authToken,
-            'Content-Type': 'application/json'
-        },
-        'body': JSON.stringify(plan)
-    })
-    return result;
-}
+
 
 export async function addPlannedExpense(authToken, plannedExpense) {
-    const result = await fetch(`${backend_base}/plannedExpenses`, {
+    const result = await fetch(`${backendBase}/plannedExpenses`, {
         'method': 'POST',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -109,7 +99,7 @@ export async function addPlannedExpense(authToken, plannedExpense) {
 }
 
 export async function addPastExpense(authToken, pastExpense) {
-    const result = await fetch(`${backend_base}/pastExpenses`, {
+    const result = await fetch(`${backendBase}/pastExpenses`, {
         'method': 'POST',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -121,7 +111,7 @@ export async function addPastExpense(authToken, pastExpense) {
 }
 
 export async function deletePlan(authToken, userId, planId) {
-    const result = await fetch(`${backend_base}/deletePlan?userId=${userId}&_id=${planId}`,{
+    const result = await fetch(`${backendBase}/deletePlan?userId=${userId}&_id=${planId}`,{
         'method':'DELETE',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -132,7 +122,7 @@ export async function deletePlan(authToken, userId, planId) {
 }
 
 export async function deletePlannedExpense(authToken, userId, plannedExpenseId) {
-    const result = await fetch(`${backend_base}/deletePlanned?userId=${userId}&_id=${plannedExpenseId}`,{
+    const result = await fetch(`${backendBase}/deletePlanned?userId=${userId}&_id=${plannedExpenseId}`,{
         'method':'DELETE',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -143,7 +133,7 @@ export async function deletePlannedExpense(authToken, userId, plannedExpenseId) 
 }
 
 export async function deletePastExpense(authToken, userId, pastExpenseId) {
-    const result = await fetch(`${backend_base}/deletePast?userId=${userId}&_id=${pastExpenseId}`,{
+    const result = await fetch(`${backendBase}/deletePast?userId=${userId}&_id=${pastExpenseId}`,{
         'method':'DELETE',
         'headers': {
             'Authorization': 'Bearer ' + authToken,
@@ -154,7 +144,7 @@ export async function deletePastExpense(authToken, userId, pastExpenseId) {
 }
 
 export async function editPlan(authToken, userId, planId, plan) {
-    const result = fetch(`${backend_base}/updatePlan?userId=${userId}&_id=${planId}`, {
+    const result = fetch(`${backendBase}/updatePlan?userId=${userId}&_id=${planId}`, {
         'method': 'PUT',
         'headers': {
           'Authorization': 'Bearer ' + authToken,
@@ -166,7 +156,7 @@ export async function editPlan(authToken, userId, planId, plan) {
 }
 
 export async function editPlannedExpense(authToken, userId, plannedExpenseId, plannedExpense) {
-    const result = fetch(`${backend_base}/updatePlannedExpense?userId=${userId}&_id=${plannedExpenseId}`, {
+    const result = fetch(`${backendBase}/updatePlannedExpense?userId=${userId}&_id=${plannedExpenseId}`, {
         'method': 'PUT',
         'headers': {
           'Authorization': 'Bearer ' + authToken,
@@ -178,7 +168,7 @@ export async function editPlannedExpense(authToken, userId, plannedExpenseId, pl
 }
 
 export async function editPastExpense(authToken, userId, pastExpenseId, pastExpense) {
-    const result = fetch(`${backend_base}/updatePastExpense?userId=${userId}&_id=${pastExpenseId}`, {
+    const result = fetch(`${backendBase}/updatePastExpense?userId=${userId}&_id=${pastExpenseId}`, {
         'method': 'PUT',
         'headers': {
           'Authorization': 'Bearer ' + authToken,
@@ -188,3 +178,66 @@ export async function editPastExpense(authToken, userId, pastExpenseId, pastExpe
       });
       return result;
 }
+
+
+export async function getCarInfo(authToken, vin){
+    const result = await fetch(`${backendBase}/getValuableCarInfo?vin=${vin}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.json();
+}
+
+
+export async function getHomePrice(authToken, zip, amt, apr, term){
+    const result = await fetch(`${backendBase}/getHomePrice?zip=${zip}&amt=${amt}&apr=${apr}&term=${term}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.json();
+}
+
+export async function getAptPrice(authToken, zip, amt){
+    const result = await fetch(`${backendBase}/getAptPrice?zip=${zip}&amt=${amt}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.json();
+}
+
+export async function getCarLoanPayments(authToken, amt, apr, term){
+    const result = await fetch(`${backendBase}/getCarLoanPayments?amt=${amt}&apr=${apr}&term=${term}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.text();
+}
+
+export async function buyCarInFull(authToken, zip, price){
+    const result = await fetch(`${backendBase}/buyCarInFull?zip=${zip}&price=${price}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.json();
+}
+
+export async function getTaxedAmount(authToken, zip, amount){
+    const result = await fetch(`${backendBase}/getTaxedAmount?zip=${zip}&amount=${amount}`, {
+        'method': 'GET',
+        'headers': {
+          'Authorization': 'Bearer ' + authToken,
+        }
+      })
+    return await result.json();
+}
+// export async

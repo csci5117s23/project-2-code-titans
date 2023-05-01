@@ -6,7 +6,7 @@ CSCI 5117, Spring 2022, [assignment description](https://canvas.umn.edu/courses/
 
 * Team Name: Code Titans
 * App Name: DuckGet
-* App Link: <https://TODO.com/>
+* App Link: <https://duckget.netlify.app/>
 
 ### Students
 
@@ -20,15 +20,18 @@ CSCI 5117, Spring 2022, [assignment description](https://canvas.umn.edu/courses/
 **Describe the most challenging features you implemented
 (one sentence per bullet, maximum 4 bullets):**
 
-* ...
+* Connecting the database to the various different endpoints for different budgeting information of DuckGet
+* Installing a nextJS application as a PWA proved to be tricky with the browser service workers not cooperating
+* Rendering all the calculations for auto, home and other expenses
+* Creating a database schema to fit all the requirements of the budgeting app
 
 Which (if any) device integration(s) does your app support?
 
-* ...
+* Geolocation to get the user's nearset zipcode for differing state taxes/rates.
 
 Which (if any) progressive web app feature(s) does your app support?
 
-* ...
+* Installing a PWA feature. From the web browser, we can install the DuckGet app into a mobile-friendly PWA version
 
 
 
@@ -72,7 +75,9 @@ along with a very brief caption:**
 Please do not document required libraries (e.g., Vue, Vuefire, Firebase).**
 
 * GCP: For Car API data storage
-* ...
+* Api Ninjas API- API to get Car, Location , Sales and Mortgage Tax information
+* NHTSA API - API for car lookup and more specific auto information
+* next-pwa: For installing a PWA
 
 **If there's anything else you would like to disclose about how your project
 relied on external code, expertise, or anything else, please disclose that

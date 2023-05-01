@@ -95,9 +95,55 @@ const secondBucketName = 'housing_stuff';
 
 // const thirdBucketName = 'location_stuff';
 
+// const file = storage.bucket(secondBucketName).file(secondFilename);
+// const contents = await file.download();
+// const resp = contents;
+// const data = resp[0].toString();
+// const lines = data.split("\n");
 
+// Sample Data.js function?
+// export async function getCarInfo(authToken,userId,carMake,carYear,carModel) {
+//   const result = await fetch(`${backend_base}/carPage?userId=${userId}&make=${carMake}&year=${carYear}&model=${carModel}`,{
+//     'method':'GET',
+//     'headers': {'Authorization': 'Bearer ' + authToken},
+//     'X-Api-Key': apiNinjaKey
+//   })
+//   return await result.json();
+// }
 
-async function getAcuras(carMake,carYear,carModel){
+async function getStateByZip(zip){
+  const api_url = `https://api.api-ninjas.com/v1/zipcode?zip=${zip}`;
+  const response = await fetch(api_url, {headers: {
+      "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => { console.log(data[0].state); return data[0].state;}).catch(error => console.error(error));
+  return response;
+}
+
+async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
+  const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
+  const response = await fetch(api_url, {headers: {
+      "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
+  return response;
+}
+
+async function getTotalTaxRate(zip){
+  const api_url = `https://api.api-ninjas.com/v1/salestax?zip_code=${zip}`;
+  const response = await fetch(api_url, {headers: {
+      "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {console.log("Data[0].total_rate: "); console.log(data[0].total_rate); return data[0].total_rate;}).catch(error => console.error(error));
+  return response;
+}
+
+async function getCarMake(VIN){
+  const api_url = `https://api.api-ninjas.com/v1/vinlookup?vin=${VIN}`;
+  const response = await fetch(api_url, {headers: {
+      "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: "); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
+  return response;
+}
+
+async function getCarPrice(carMake,carYear,carModel){
   // await storage.bucket(bucketName).upload(filename, options);
   // console.log(`File ${filename} uploaded to ${bucketName}.`);
 
@@ -131,38 +177,137 @@ async function getAcuras(carMake,carYear,carModel){
   
   console.log("Average Price: " + avgPrice);
 
-  return avgPrice;
+  return avgPrice.toFixed(2);
 }
 
-// Sample Data.js function?
-export async function getCarInfo(authToken,userId,carMake,carYear,carModel) {
-  const result = await fetch(`${backend_base}/carPage?userId=${userId}&make=${carMake}&year=${carYear}&model=${carModel}`,{
-    'method':'GET',
-    'headers': {'Authorization': 'Bearer ' + authToken},
-    'X-Api-Key': apiNinjaKey
-  })
-  return await result.json();
-}
+// async function getCarInfo(VIN){
+//   const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+//   const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data:"); console.log(data); return data;}).catch(error => console.error(error));
+//   return response;
+// }
 
-async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
-  const file = storage.bucket(secondBucketName).file(secondFilename);
-  const contents = await file.download();
-
-  // const resp = contents;
-  // const data = resp[0].toString();
-  // const lines = data.split("\n");
-
-  const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
-  const response = await fetch(api_url, {headers: {
-      "X-Api-Key": apiNinjaKey
-    }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
+async function getCarModel(VIN){
+  const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+  const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
   return response;
 }
 
+async function getValuableCarInfo(VIN){
+  const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+  const info1 = await fetch(api_url).then(response => response.json()).then((data) => {
+    return [data.Results[7].Value.charAt(0) + data.Results[7].Value.slice(1).toLowerCase(),data.Results[9].Value,data.Results[10].Value];
+  }).catch(error => console.error(error));
+  // const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data"); console.log(data.Results[9].Value); return [data.Results[7].Value,data.Results[9].Value,data.Results[10].Value];}).catch(error => console.error(error));
+  const price = await getCarPrice(info1[0],info1[2],info1[1]);
+  const info = {
+    'make': info1[0],
+    'model': info1[1],
+    'year': info1[2],
+    'price': price
+  };
+  return info;
+}
+
+async function getAvgHomeInsuranceCost(state){
+
+  const file = storage.bucket(secondBucketName).file(secondFilename);
+
+  const contents = await file.download();
+  // console.log(`Contents of ${filename}: ${contents}`);
+  // console.log("CarYear: " + carYear);
+  const response = contents;
+  const data = response[0].toString();
+  const lines = data.split("\n");
+  
+  let avgCostPercent = 0;
+  let propertyTaxPercent = 0;
+  let rentInsurance = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const [stateAbbr,cost,propertyTax,rentersInsurance] = lines[i].split(",");
+    if(stateAbbr == state){
+      avgCostPercent = (cost / 250000);
+      propertyTaxPercent = propertyTax;
+      rentInsurance = rentersInsurance;
+    }
+  }
+  
+  console.log("Average Insurance cost (%) for " + state + ": " + avgCostPercent);
+  console.log("Property tax (%): " + propertyTaxPercent);
+  console.log("Renters insurance: " + rentInsurance);
+
+  return [avgCostPercent,propertyTaxPercent,rentInsurance];
+}
+
+function getCarPaidInFull(price,tax){
+  return price * (1 + parseFloat(tax));
+}
+
+app.get('/getState', async (req, res) => {
+  const response = await getStateByZip(req.query.zip);
+  res.send(response.toString());
+});
+
 // Totalcost, downpayment, APR, loan term
 app.get('/getHomePrice', async (req, res) => {
-  getLoanPayables(req.query.amt,req.query.interestRate,req.query.duration,req.query.homeInsurance,req.query.propertyTax);
-})
+  const response = getStateByZip(req.query.zip).then((state) => getAvgHomeInsuranceCost(state)).then((insurance) => 
+  getLoanPayables(req.query.amt,req.query.apr,req.query.term,insurance[0] * req.query.amt,insurance[1] * req.query.amt));
+  // const state = await getStateByZip(req.query.zip);
+  // const youHaveAHouseButNoInsurance = await getAvgHomeInsuranceCost(state);
+  // const response = await getLoanPayables(req.query.amt,req.query.apr,req.query.term,youHaveAHouseButNoInsurance[0] * req.query.amt,youHaveAHouseButNoInsurance[1] * req.query.amt);
+  // const response = await getLoanPayables(req.query.amt,req.query.apr,req.query.term,insurance[0] * req.query.amt,insurance[1] * req.query.amt);
+  res.send((await response).toString());
+});
+
+app.get('/getAptPrice', async (req, res) => {
+  const response = getStateByZip(req.query.zip).then((state) => getAvgHomeInsuranceCost(state)).then((insurance) => getLoanPayables(req.query.amt * 12,0.1,1,insurance[2],0));
+  // const state = await getStateByZip(req.query.zip);
+  // const youHaveAHouseButNoInsurance = await getAvgHomeInsuranceCost(state);
+  // const response = await getLoanPayables(req.query.amt,req.query.apr,req.query.term,youHaveAHouseButNoInsurance[0] * req.query.amt,youHaveAHouseButNoInsurance[1] * req.query.amt);
+  // const response = await getLoanPayables(req.query.amt * 12,0.1,1,insurance[2],0);
+  res.send((await response).toString());
+});
+
+app.get('/buyCarInFull', async (req, res) => {
+  const response = getTotalTaxRate(req.query.zip).then((tax) => {return getCarPaidInFull(req.query.price,tax)});
+  res.send((await response).toString());
+});
+
+app.get('/getCarLoanPayments', async (req, res) => {
+  const response = await getLoanPayables(req.query.amt,req.query.apr,req.query.term,0,0);
+  res.send(response.toString());
+});
+
+app.get('/getTaxRate', async (req, res) => {
+  const response = await getTotalTaxRate(req.query.zip);
+  res.send(response.toString());
+});
+
+app.get('/getCarMake', async (req, res) => {
+  const response = await getCarMake(req.query.vin);
+  res.send(response.toString());
+});
+
+app.get('/getCarPrice', async (req, res) => {
+  const response = await getCarPrice(req.query.carMake,req.query.carYear,req.query.carModel);
+  res.send(response.toString());
+});
+
+app.get('/getTaxedAmount', async (req, res) => {
+  const response = getTotalTaxRate(req.query.zip).then((tax) => (1 + parseFloat(tax)) * req.query.amount);
+  res.send((await response).toString());
+});
+
+app.get('/getCarModel', async (req, res) => {
+  const response = await getCarInfo(req.query.vin);
+  res.send(response);
+});
+
+app.get('/getValuableCarInfo', async (req, res) => {
+  const response = await getValuableCarInfo(req.query.vin);
+  res.send(response);
+});
+
 
 app.get('/calculateCarPrice', async (req, res) => {
   console.log("In /carPage");

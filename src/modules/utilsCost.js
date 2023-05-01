@@ -13,14 +13,22 @@ export default function CostCalculator(){
     const [carModel,setCarModel] = useState(null);
     const [carVIN,setCarVIN] = useState(null);
 
+    const [principal,setPrincipal] = useState(0);
+    const [intRate,setIntRate] = useState(0);
+    const [loanDuration,setLoanDuration] = useState(0);
+
+    const [zipcode,setZipcode] = useState(null);
+    const [state,setState] = useState("Click to find your state!");
+    const [avgHomeInsuranceCost,setAvgHomeInsuranceCost] = useState(0);
+
     const { isLoaded, userId, isSignedIn, getToken } = useAuth();
 
     // useEffect(() => {}, [isLoaded,loanAmt])
 
-    async function getValues(){
+    async function getValues(principal,intRate,loanDuration,avgHomeInsurance){
         console.log("getValues function reached");
         // setLoanAmt(calcCost.getLoanPayables(200000,3.5,30));
-        setLoanAmt(await getLoanPayables(200000,3.5,30));
+        setLoanAmt(await getLoanPayables(principal,intRate,loanDuration,avgHomeInsurance));
         return loanAmt;
     }
     
@@ -41,6 +49,13 @@ export default function CostCalculator(){
         return carMake;
     }
 
+    async function getStateOfZipCode(zip){
+        console.log("getStateOfZipcode function reached");
+        setState(await getStateByZip(zip));
+        setAvgHomeInsuranceCost(await getAvgHomeInsuranceCost(state));
+        return state;
+    }
+
     async function getCarPriceEstimate(carMake,carYear,carModel){
         console.log("getCarPriceEstimate function reached");
         setCarPrice(await getCarPrice(carMake,carYear,carModel));
@@ -49,8 +64,14 @@ export default function CostCalculator(){
 
     return (
         <>
+            <h3>Enter your zipcode to find the state</h3>
+            <textarea placeholder="Enter 5 digit zipcode" onChange={(e) => setZipcode(e.target.value)}></textarea>
+            <button onClick={async () => getStateOfZipCode(zipcode)}>{state}</button>
             <h3>Loan amount payable per month:</h3><br></br>
-            <button onClick={getValues}>{loanAmt}</button>
+            <textarea placeholder="Enter your house loan amount" onChange={(e) => setPrincipal(e.target.value)}></textarea>
+            <textarea placeholder="Enter the (%) interest rate on your loan" onChange={(e) => setIntRate(e.target.value)}></textarea>
+            <textarea placeholder="Enter the duration of the loan period" onChange={(e) => setLoanDuration(e.target.value)}></textarea>
+            <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost)}>{loanAmt}</button>
             <h3>Total tax Rate for your zip code:</h3>
             <button onClick={getZipTax}>{taxRate}</button>
             <h3>Get Car Make:</h3>
@@ -62,8 +83,16 @@ export default function CostCalculator(){
     );
 }
 
-async function getLoanPayables(amt,interestRate,duration){
-    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}`;
+async function getStateByZip(zip){
+    const api_url = `https://api.api-ninjas.com/v1/zipcode?zip=${zip}`;
+    const response = await fetch(api_url, {headers: {
+        "X-Api-Key": apiNinjaKey
+      }}).then(response => response.json()).then(data => { console.log(data[0].state); return data[0].state;}).catch(error => console.error(error));
+    return response;
+}
+
+async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance){
+    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}`;
     const response = await fetch(api_url, {headers: {
         "X-Api-Key": apiNinjaKey
       }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
@@ -138,4 +167,23 @@ async function getCarModel(VIN){
     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
     return response;
+}
+
+async function getAvgHomeInsuranceCost(state){
+    const response = await fetch("/avgHomeInsuranceCosts.txt");
+    const data = await response.text();
+    const lines = data.split("\n");
+
+    let avgCost = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const [stateAbbr,cost] = lines[i].split(",");
+      if(stateAbbr == state){
+        avgCost = cost;
+      }
+    }
+    
+    console.log("Average Insurance cost for " + state + ": " + avgCost);
+
+    return avgCost;
 }

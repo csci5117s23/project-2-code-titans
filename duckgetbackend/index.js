@@ -9,6 +9,25 @@ import { date, object, string, number, boolean} from 'yup';
 import jwtDecode from 'jwt-decode';
 
 const { Storage } = require('@google-cloud/storage');
+const apiNinjaKey = 'VUqM8pOYRSUXDglRoav+Vg==EuvtIuMkwpPN0t9r';
+
+const userAuth = async (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    if (authorization) {
+      const token = authorization.replace('Bearer ','');
+      // NOTE this doesn't validate, but we don't need it to. codehooks is doing that for us.
+      const token_parsed = jwtDecode(token);
+      req.user_token = token_parsed;
+    } else{
+      return res.status(403).end();
+    }
+    next();
+  } catch (error) {
+    next(error);
+  } 
+}
+app.use(userAuth)
 
 // test route for https://<PROJECTID>.api.codehooks.io/dev/
 app.get('/', (req, res) => {
@@ -39,7 +58,7 @@ const bucketName = 'car_info';
 
 
 
-const getAcuras = async function (carMake,carYear,carModel){
+async function getAcuras(carMake,carYear,carModel){
   // await storage.bucket(bucketName).upload(filename, options);
   // console.log(`File ${filename} uploaded to ${bucketName}.`);
 
@@ -76,9 +95,17 @@ const getAcuras = async function (carMake,carYear,carModel){
   return avgPrice;
 }
 
+// Sample Data.js function?
+export async function getCarInfo(authToken,userId,carMake,carYear,carModel) {
+  const result = await fetch(`${backend_base}/carPage?userId=${userId}&make=${carMake}&year=${carYear}&model=${carModel}`,{
+    'method':'GET',
+    'headers': {'Authorization': 'Bearer ' + authToken},
+    'X-Api-Key': apiNinjaKey
+  })
+  return await result.json();
+}
 
-
-app.get('/pongal', async (req, res) => {
+app.get('/carPage', async (req, res) => {
   console.log("Woo PongaloPongal");
 
   res.send((await getAcuras("Acura","2014","TL")).toString());

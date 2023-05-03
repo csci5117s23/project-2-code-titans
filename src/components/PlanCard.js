@@ -20,18 +20,8 @@ export default function PlanCard({name,expenditure,labels,spendingData,summaryDa
     const options = {
       plugins: {
         legend: {
-          labels: {
-            // Prevent items with undefined labels from appearing in the legend
-            filter: (item) => item.text !== undefined
-          }
-        },
-        tooltips: {
-          // Prevent items with undefined labels from showing tooltips
-          filter: (item, chart) => chart.labels[item.index] !== undefined
+          display: false,
         }
-        // legend: {
-        //   display: false,
-        // },
       },
       maintainAspectRatio: true,
     };

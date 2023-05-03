@@ -39,12 +39,6 @@ Which (if any) progressive web app feature(s) does your app support?
 
 ### Low-Fidelity Diagram
 ![Low-Fidelity Diagram](mockups/low-fidelity.png)
-#### Home Page
-The home page highlights the user's Monthly Expenditure, Spending Summary and any spending plans that the user might be following, also allowing them to navigate to each of these pages easily.
-#### Set New Plan Page
-The set new plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
-#### Compare Plans Page
-The compare plans page will greet the user with a few pre-made budget plan suggestions, but will also allow them to create and customize a plan unique to them depending on their specific preferences.
 
 **Todo**
 
@@ -65,8 +59,17 @@ Here is a high-fidelity version of our project that we also created for referenc
 **[Add a screenshot of each key page](https://stackoverflow.com/questions/10189356/how-to-add-screenshot-to-readmes-in-github-repository)
 along with a very brief caption:**
 
-![](https://media.giphy.com/media/o0vwzuFwCGAFO/giphy.gif)
+#### Home Page
+The home page highlights the user's Monthly Expenditure, Spending Summary and any spending plans that the user might be following, also allowing them to navigate to each of these pages easily.
+![Home Page](mockups/HomePage.jpg)
 
+#### Set New Plan Page
+The set new plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
+![Set New Plan](mockups/SetNewPlan.jpg)
+
+#### Compare Plans Page
+The compare plans page will greet the user with a few pre-made budget plan suggestions, but will also allow them to create and customize a plan unique to them depending on their specific preferences.
+![Compare Plans](mockups/ComparePlans.jpg)
 
 
 ## External Dependencies

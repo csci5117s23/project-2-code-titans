@@ -32,12 +32,16 @@ export default function NewPlanPage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const { id } = router.query;
+
   const updateChanges = async () => {
+    // console.log("location: " + location);
+    if(planName.trim()==="" || zipCode.trim()==="" || projectedYearlyIncome.trim()==="") return;
     const token = await getToken({ template: "codehooks" })
     let savedChanges = {
       name: planName,
       userId: userId,
       location: zipCode,
+      projectedIncome: projectedYearlyIncome,
       isActive: active,
       inProgress: false
     };
@@ -74,11 +78,10 @@ export default function NewPlanPage() {
         }
         process().then((res) => {
             setPlanName(res.inProgress ? "" : res.name);
-            setZipCode(res.location);
-            setProjectedYearlyIncome(res.projectedIncome);
+            setZipCode(res.inProgress ? "" : res.location);
+            setProjectedYearlyIncome(res.inProgress ? "" : res.projectedIncome);
             setActive(res.isActive);
             setInProgress(res.inProgress);
-            console.log("progress: " + res.name);
         }).catch(() => {
             console.log("404");
         })
@@ -140,6 +143,7 @@ export default function NewPlanPage() {
         handleClose={handleModalClose}
         expenseId={customId}
         planId={id}
+        location={zipCode}
       />
       <Head>
         <title>{inProgress ? "New Plan" : "Edit Plan"}</title>
@@ -148,6 +152,7 @@ export default function NewPlanPage() {
         <link rel="icon" href="/duckget-logo.png" />
       </Head>
       <div style={{ minHeight: "100vh", backgroundColor: "#E4E4E4" }}>
+        <Form>
         <Container fluid className="p-0">
           <div
             className="p-4 w-100 white-box-container"
@@ -191,39 +196,46 @@ export default function NewPlanPage() {
                     type="text"
                     value={planName}
                     onChange={(e) => setPlanName(e.target.value)}
+                    placeholder="Enter Plan Name"
                     required
                     style={{
-                      background: "#F7E7D5",
-                      borderRadius: "11px",
+                        background: "#F7E7D5",
+                        borderRadius: "11px",
                     }}
-                  />
+                    />
+                  <Form.Control.Feedback></Form.Control.Feedback>
                   <Form.Label>
                     <span className="light-brown">Projected Yearly Income</span>
                   </Form.Label>
                   <Form.Control
-                    type="text"
+                    type="number"
                     value={projectedYearlyIncome}
                     onChange={(e) => setProjectedYearlyIncome(e.target.value)}
+                    placeholder="Enter Projected Yearly Income"
                     required
                     style={{
-                      background: "#F7E7D5",
-                      borderRadius: "11px",
+                        background: "#F7E7D5",
+                        borderRadius: "11px",
                     }}
-                  />
+                    />
                   <Form.Label>
                     <span className="light-brown">Zip Code</span>
                   </Form.Label>
                   <div className="input-group">
                   <Form.Control
-                    type="text"
+                    type="number"
                     value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
+                    onChange={(e) => {
+                        const zipCodeFixed = e.target.value.replace("/.","").replace("/+","");
+                        setZipCode(zipCodeFixed);
+                    }}
+                    placeholder="Enter Zip Code"
                     required
                     style={{
-                      background: "#F7E7D5",
-                      borderRadius: "11px",
+                        background: "#F7E7D5",
+                        borderRadius: "11px",
                     }}
-                  />
+                    />
                 <div className="input-group-append">
                   <span onClick={findMe} className="input-group-text">Find me!</span>
                 </div>
@@ -245,35 +257,35 @@ export default function NewPlanPage() {
                   className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("Auto")}
-                />
+                  />
                 <img
                   src="/home.png"
                   alt="Home"
                   className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("Home")}
-                />
+                  />
                 <img
                   src="/other.png"
                   alt="Other"
                   className="img-fluid m-2"
                   style={{ maxWidth: "150px", cursor: "pointer" }}
                   onClick={() => handleExpenseClick("other")}
-                />
+                  />
               </Col>
             </Row>
             <Row>
               {createdExpenses.map((expense) => {
-                return(
+                  return(
                   <Col xs={12} sm={6} md={4} lg={3}>
                   <PlannedExpensesCard
                     plannedExpense={expense}
                     onEdit={() => {
-                      setCustomId(expense._id);
-                      handleExpenseClick(expense.name);
+                        setCustomId(expense._id);
+                        handleExpenseClick(expense.name);
                     }}
                     onDelete={() => {}}
-                  />
+                    />
                 </Col>)
               })}
             </Row>
@@ -282,35 +294,37 @@ export default function NewPlanPage() {
         <div className="p-3 text-center" id="sideBySide">
           <Button
             className="d-block mx-auto"
+            type="submit"
             style={{
-              backgroundColor: "#47B1ED",
-              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-              borderRadius: "10px",
-              width: "30%",
-              height: "80px",
-              border: "none",
-              marginBottom: "30px",
+                backgroundColor: "#47B1ED",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                borderRadius: "10px",
+                width: "30%",
+                height: "80px",
+                border: "none",
+                marginBottom: "30px",
             }}
             onClick={updateChanges}
-          >
+            >
             <h1>Save</h1>
           </Button>
           <Button
             className="d-block mx-auto"
             style={{
-              backgroundColor: "#FF1D18",
-              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-              borderRadius: "10px",
-              width: "30%",
-              height: "80px",
-              border: "none",
-              marginBottom: "30px",
+                backgroundColor: "#FF1D18",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                borderRadius: "10px",
+                width: "30%",
+                height: "80px",
+                border: "none",
+                marginBottom: "30px",
             }}
             onClick={deleteChanges}
-          >
+            >
             <h1>Delete</h1>
           </Button>
         </div>
+    </Form>
       </div>
     </>
   );

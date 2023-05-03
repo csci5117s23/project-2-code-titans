@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { getAllPlans, getAllPlannedExpenses, getSpecificPlannedExpenses, getSinglePlannedExpense } from "@/modules/Data";
+import {
+  getAllPlans,
+  getAllPlannedExpenses,
+  getSpecificPlannedExpenses,
+  getSinglePlannedExpense,
+} from "@/modules/Data";
 import {
   Container,
   Nav,
@@ -19,19 +24,46 @@ import PlanCard from "@/components/PlanCard";
 
 export default function PlansPage() {
   const [plans, setNewPlans] = useState([]);
-  const [totalExpenditure,setTotalExpenditure] = useState(0);
-
+  const [totalExpenditure, setTotalExpenditure] = useState(0);
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    const getTotalExp = async (planId) => {
+      return await getToken({ template: "codehooks" }).then(async (token) => {
+        return await getSpecificPlannedExpenses(token, userId, planId).then((res) => {
+          let totalExp = 0;
+          res.map((entry) => {
+            console.log(entry.amount);
+            totalExp += entry.amount;
+          });
+          console.log("total exp: " + totalExp);
+          return totalExp;
+        });
+      });
+    }
     getToken({ template: "codehooks" }).then(async (token) => {
-      const res =  await getAllPlans(token, userId);
-      console.log("res: " + res.length);
-      if(res.length > 0)
-        setNewPlans(res);
+      const res = await getAllPlans(token, userId);
+      console.log("res1: " + res.length);
+      if (res.length > 0){
+      setNewPlans(await Promise.all(res.map(async (plan) => {
+        let totalExp = await getTotalExp(plan._id)
+        console.log("we made it here with totalExp: " + totalExp);
+        return(
+        <Col xs={12} lg={4}>
+          <PlanCard
+            name={plan.name}
+            expenditure={totalExp.toFixed(2)}
+            summaryData={"yeah and?"}
+            id={plan._id}
+            activeStatus={false}
+          />
+        </Col>
+      )})));
+          }
     });
-  }, [router, isLoaded])
+    
+  }, [router, isLoaded]);
 
   // async function getPlanExpenseInformation(){
   //   getToken({ template: "codehooks" }).then(async (token) => {
@@ -47,9 +79,9 @@ export default function PlansPage() {
   else {
     console.log("Else reached. plans: ");
     console.log(plans);
-    console.log("plans[0]");
-    console.log(plans[0]);
-    let totalExp = 0;
+    // console.log("plans[0]");
+    // console.log(plans[0]);
+
     // getToken({ template: "codehooks" }).then(async (token) => {
     //   (getAllPlans(token, userId)).then((data) => {
     //     // console.log("data[0]._id");
@@ -78,37 +110,10 @@ export default function PlansPage() {
     //   // console.log("res[0]._id");
     //   // console.log(res[0]._id);
     // });
-    getToken({ template: "codehooks" }).then(async (token) => {
-      (getAllPlannedExpenses(token,userId).then((res) => {
-        console.log("res: ");
-        console.log(res);
-        res.map((entry) => {
-          console.log("entry: ");
-          console.log(entry);
-          // console.log("entry.amount: " + entry.amount);
-          // console.log("entry.name: " + entry.name);
-          totalExp += entry.amount;
-        });
-      }))
-      // console.log("res[0]._id");
-      // console.log(res[0]._id);
-    });
-    setTotalExpenditure(totalExp);
 
     // getToken({ template: "codehooks" }).then(async (token) => {
     //   const data = await getSpecificPlannedExpenses(token,userId,data[0]); //First planned expense
     // });
-    const planList = plans.map((plan) => (
-      <Col xs={12} lg={4}>
-        <PlanCard
-          name={plan.name}
-          expenditure={totalExpenditure}
-          summaryData={"yeah and?"}
-          id={plan._id}
-          activeStatus={false}
-        />
-      </Col>
-    ));
 
     return (
       <>
@@ -120,7 +125,7 @@ export default function PlansPage() {
         </Head>
         <Navigation />
         <Container className="mx-auto" style={{ marginTop: "30px" }}>
-          <Row>{planList}</Row>
+          <Row>{plans}</Row>
           <div className="d-flex justify-content-center align-items-center">
             <Button
               className="rounded-4 my-10"
@@ -134,8 +139,13 @@ export default function PlansPage() {
               }}
               onClick={async () => {
                 const token = await getToken({ template: "codehooks" });
-                const res = await addPlan(token, {name: 'fake', userId: userId, location: '00000', isActive: false});
-                router.push('/plans/' + res._id);
+                const res = await addPlan(token, {
+                  name: "fake",
+                  userId: userId,
+                  location: "00000",
+                  isActive: false,
+                });
+                router.push("/plans/" + res._id);
               }}
             >
               <h1>New Plan</h1>

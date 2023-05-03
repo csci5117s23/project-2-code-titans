@@ -13,6 +13,7 @@ import {
   Form,
 } from "react-bootstrap";
 import ExpenseModal from "@/components/ExpenseModal";
+import Loader from "@/components/Loader";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -20,6 +21,7 @@ import PlannedExpensesCard from "@/components/PlannedExpensesCard";
 import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan } from "@/modules/Data";
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedExpense, setSelectedExpense] = useState("");
   const [planName, setPlanName] = useState("");
   const [projectedYearlyIncome, setProjectedYearlyIncome] = useState("");
@@ -35,6 +37,7 @@ export default function NewPlanPage() {
 
   const updateChanges = async () => {
     // console.log("location: " + location);
+    setIsLoading(true);
     if(planName.trim()==="" || zipCode.trim()==="" || projectedYearlyIncome.trim()==="") return;
     const token = await getToken({ template: "codehooks" })
     let savedChanges = {
@@ -47,6 +50,7 @@ export default function NewPlanPage() {
     };
     const res = await editPlan(token, userId, id, savedChanges);
     router.push('/plans')
+    setIsLoading(false);
   }
 
   const deleteChanges = async () => {
@@ -56,6 +60,7 @@ export default function NewPlanPage() {
   }
 
   useEffect(() => {
+    setIsLoading(true);
     getToken({ template: "codehooks" }).then(async (token) => {
       const res =  await getSpecificPlannedExpenses(token, userId, id);
       console.log("res: " + res.length)
@@ -63,11 +68,13 @@ export default function NewPlanPage() {
       if(createdExpenses && createdExpenses.length > 0)
         console.log(id + " expenses: "+ userId + " : " + createdExpenses[0].name);
       setCustomId(null);  
+      setIsLoading(false);
     });
     
   }, [showModal, router])
 
   useEffect(() => {
+    setIsLoading(true);
     getToken({ template: "codehooks" }).then(async (token) => {
         async function process() {
             if(id) {
@@ -86,7 +93,9 @@ export default function NewPlanPage() {
             console.log("404");
         })
         if(id) {
+        
         }
+        setIsLoading(false);
     })
   }, [router, isLoaded])
 
@@ -105,6 +114,7 @@ export default function NewPlanPage() {
   };
 
   const findZipCode = async (latitude, longitude) => {
+    setIsLoading(true);
     const response = await fetch("/zip.txt");
     const data = await response.text();
     const lines = data.split("\n");
@@ -123,9 +133,11 @@ export default function NewPlanPage() {
       }
     }
     setZipCode(closestZipCode);
+    setIsLoading(false);
   };
 
   const findMe = () => {
+    setIsLoading(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
       await findZipCode(position.coords.latitude, position.coords.longitude);
@@ -133,10 +145,16 @@ export default function NewPlanPage() {
     } else {
       alert("Geolocation is not supported by this browser.");
     }
+    setIsLoading(false);
   };
-
-  return (
+  
+  return  (
     <>
+    {isLoading && (
+          <div className="loader-container">
+            <Loader />
+          </div>
+      )}
       <ExpenseModal
         show={showModal}
         expense={selectedExpense}

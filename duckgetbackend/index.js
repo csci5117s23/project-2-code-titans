@@ -12,6 +12,7 @@ const PlanYup = object({
   name: string().required(),
   userId: string().required(),
   location: string().required(),
+  projectedIncome: number().default(0),
   isActive: boolean().required(),
   inProgress: boolean().optional()
 })
@@ -22,7 +23,6 @@ const PlannedExpenseYup = object({
   amount: number().required().positive(), // need to do a check at the frontend for whether the expense is at least $0.01
   planId: string().required(),
   dueDate: date().required().min(new Date()), // the date of the planned expense cannot be before today
-  l: string().optional(),
   carModel: string().optional(),
   carMake: string().optional(),
   carYear: date().optional(),
@@ -39,7 +39,7 @@ const PastExpenseYup = object({
   date: date().required().max(new Date())
 })
 
-const { Storage } = require('@google-cloud/storage');
+// const { Storage } = require('@google-cloud/storage');
 const apiNinjaKey = 'VUqM8pOYRSUXDglRoav+Vg==EuvtIuMkwpPN0t9r';
 
 // test route for https://<PROJECTID>.api.codehooks.io/dev/
@@ -79,10 +79,10 @@ const gcpKey = {
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/duckgetbackend%40duckget.iam.gserviceaccount.com"
 }
 
-const storage = new Storage({
-  credentials: gcpKey,
-  projectId: 'duckget',
-});
+// const storage = new Storage({
+//   credentials: gcpKey,
+//   projectId: 'duckget',
+// });
 
 const filename = 'cars.txt';
 
@@ -144,42 +144,42 @@ async function getCarMake(VIN){
   return response;
 }
 
-async function getCarPrice(carMake,carYear,carModel){
-  // await storage.bucket(bucketName).upload(filename, options);
-  // console.log(`File ${filename} uploaded to ${bucketName}.`);
+// async function getCarPrice(carMake,carYear,carModel){
+//   // await storage.bucket(bucketName).upload(filename, options);
+//   // console.log(`File ${filename} uploaded to ${bucketName}.`);
 
-  const file = storage.bucket(bucketName).file(filename);
+//   const file = storage.bucket(bucketName).file(filename);
 
-  const contents = await file.download();
-  // console.log(`Contents of ${filename}: ${contents}`);
-  // console.log("CarYear: " + carYear);
-  const response = contents;
-  const data = response[0].toString();
-  const lines = data.split("\n");
+//   const contents = await file.download();
+//   // console.log(`Contents of ${filename}: ${contents}`);
+//   // console.log("CarYear: " + carYear);
+//   const response = contents;
+//   const data = response[0].toString();
+//   const lines = data.split("\n");
 
-  let avgPrice = 0;
-  let carPriceSum = 0;
-  let numCars = 0;
-  console.log('line length: ' + lines.length)
-  for (let i = 0; i < lines.length; i++) {
-    const [id,price,year,mileage,city,state,vin,make,model] = lines[i].split(",");
-    if(make == carMake && model.includes(carModel) && year == carYear){
-      numCars++;
-      carPriceSum += parseInt(price);
-    }
-  }
-  console.log("Type of carYear: " + typeof(carYear));
-  console.log("All " + carYear + " " + carMake + " " + carModel + " prices total to: " + carPriceSum);
-  console.log("Total number of cars: " + numCars);
-  // let sampleModel = "TL4dr";
-  // console.log("Sample model (TL4dr) includes TL?: " + sampleModel.includes("TL"));
+//   let avgPrice = 0;
+//   let carPriceSum = 0;
+//   let numCars = 0;
+//   console.log('line length: ' + lines.length)
+//   for (let i = 0; i < lines.length; i++) {
+//     const [id,price,year,mileage,city,state,vin,make,model] = lines[i].split(",");
+//     if(make == carMake && model.includes(carModel) && year == carYear){
+//       numCars++;
+//       carPriceSum += parseInt(price);
+//     }
+//   }
+//   console.log("Type of carYear: " + typeof(carYear));
+//   console.log("All " + carYear + " " + carMake + " " + carModel + " prices total to: " + carPriceSum);
+//   console.log("Total number of cars: " + numCars);
+//   // let sampleModel = "TL4dr";
+//   // console.log("Sample model (TL4dr) includes TL?: " + sampleModel.includes("TL"));
   
-  avgPrice = carPriceSum / numCars;
+//   avgPrice = carPriceSum / numCars;
   
-  console.log("Average Price: " + avgPrice);
+//   console.log("Average Price: " + avgPrice);
 
-  return avgPrice.toFixed(2);
-}
+//   return avgPrice.toFixed(2);
+// }
 
 // async function getCarInfo(VIN){
 //   const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
@@ -209,36 +209,36 @@ async function getValuableCarInfo(VIN){
   return info;
 }
 
-async function getAvgHomeInsuranceCost(state){
+// async function getAvgHomeInsuranceCost(state){
 
-  const file = storage.bucket(secondBucketName).file(secondFilename);
+//   const file = storage.bucket(secondBucketName).file(secondFilename);
 
-  const contents = await file.download();
-  // console.log(`Contents of ${filename}: ${contents}`);
-  // console.log("CarYear: " + carYear);
-  const response = contents;
-  const data = response[0].toString();
-  const lines = data.split("\n");
+//   const contents = await file.download();
+//   // console.log(`Contents of ${filename}: ${contents}`);
+//   // console.log("CarYear: " + carYear);
+//   const response = contents;
+//   const data = response[0].toString();
+//   const lines = data.split("\n");
   
-  let avgCostPercent = 0;
-  let propertyTaxPercent = 0;
-  let rentInsurance = 0;
+//   let avgCostPercent = 0;
+//   let propertyTaxPercent = 0;
+//   let rentInsurance = 0;
 
-  for (let i = 0; i < lines.length; i++) {
-    const [stateAbbr,cost,propertyTax,rentersInsurance] = lines[i].split(",");
-    if(stateAbbr == state){
-      avgCostPercent = (cost / 250000);
-      propertyTaxPercent = propertyTax;
-      rentInsurance = rentersInsurance;
-    }
-  }
+//   for (let i = 0; i < lines.length; i++) {
+//     const [stateAbbr,cost,propertyTax,rentersInsurance] = lines[i].split(",");
+//     if(stateAbbr == state){
+//       avgCostPercent = (cost / 250000);
+//       propertyTaxPercent = propertyTax;
+//       rentInsurance = rentersInsurance;
+//     }
+//   }
   
-  console.log("Average Insurance cost (%) for " + state + ": " + avgCostPercent);
-  console.log("Property tax (%): " + propertyTaxPercent);
-  console.log("Renters insurance: " + rentInsurance);
+//   console.log("Average Insurance cost (%) for " + state + ": " + avgCostPercent);
+//   console.log("Property tax (%): " + propertyTaxPercent);
+//   console.log("Renters insurance: " + rentInsurance);
 
-  return [avgCostPercent,propertyTaxPercent,rentInsurance];
-}
+//   return [avgCostPercent,propertyTaxPercent,rentInsurance];
+// }
 
 function getCarPaidInFull(price,tax){
   return price * (1 + parseFloat(tax));

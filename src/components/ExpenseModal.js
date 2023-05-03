@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense  }) => {
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense  }) => {
 
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
@@ -35,12 +35,14 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
 
   useEffect( () => {
     if(expenseId && expenseId.length > 0){
+      console.log("expenseId: " + expenseId);
       getToken({ template: "codehooks" }).then(async (token) => {
         async function process() {
-          const res =  (await getSinglePlannedExpense(token, userId, expenseId))[0];
+          const res =  (await getSingleExpense(token, userId, expenseId))[0];
           return res;
         }
         process().then((res) => {
+          // console.log(res);
           setName(res.name);
           setAmount(res.amount);
           setDueDate(res.dueDate);

@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
 
-import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPlannedExpense, deletePlannedExpense } from "@/modules/Data";
+import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPlannedExpense, deletePlannedExpense, getSinglePlannedExpense } from "@/modules/Data";
 
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
@@ -181,6 +181,7 @@ export default function NewPlanPage() {
         location={zipCode}
         addExpense={addPlannedExpense}
         editExpense={editPlannedExpense}
+        getSingleExpense={getSinglePlannedExpense}
         editing={editingBool}
       />
       <Head>

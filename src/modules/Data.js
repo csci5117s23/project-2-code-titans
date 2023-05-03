@@ -32,6 +32,20 @@ export async function getAllInactivePlans(authToken, userId) {
     return await result.json();
 }
 
+export async function activatePlan(authToken, userId, planId){
+    const activePlans = await getAllActivePlans(authToken, userId);
+    await activePlans.map(async (plan) => {
+        plan.isActive = false;
+        console.log(plan);
+        await editPlan(authToken, userId, plan._id, plan);
+    });
+    const currentPlan = await getPlan(authToken, userId, planId);
+    console.log("Data: cp ");
+    console.log(currentPlan[0]);
+    currentPlan[0].isActive = true;
+    return await editPlan(authToken, userId, planId, currentPlan[0]);
+}
+
 export async function getAllInProgressPlans(authToken, userId) {
     const result = await fetch(`${backendBase}/plans?userId=${userId}&inProgress=true`,{
         'method':'GET',
@@ -74,6 +88,13 @@ export async function getAllPastExpenses(authToken, userId) {
 
 export async function getSinglePastExpense(authToken, userId, pastExpenseId) {
     const result = await fetch(`${backendBase}/pastExpenses?userId=${userId}&_id=${pastExpenseId}`,{
+        'method':'GET',
+        'headers': {'Authorization': 'Bearer ' + authToken}
+    })
+    return await result.json();
+}
+export async function getPastExpensesByDate(authToken, userId, date) {
+    const result = await fetch(`${backendBase}/pastExpenses?userId=${userId}&date=${date}`,{
         'method':'GET',
         'headers': {'Authorization': 'Bearer ' + authToken}
     })

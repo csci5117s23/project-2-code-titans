@@ -19,119 +19,190 @@ import Navigation from "@/components/Navigation";
 import Loader from "@/components/Loader";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { getAllActivePlans, getPastExpensesByDate, getSpecificPlannedExpenses } from "@/modules/Data";
+import { useRef } from "react";
+import Chartjs from 'chart.js';
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
+  const [barGraphData, setBarGraphData] = useState([0,0,0,0,0,0,0,0,0,0,0,0]);
+  const [barGraphLoad, setBarGraphLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [barGraphRef, setBarGraphRef] = useState(useRef(null));
+  const [barInfo, setBarInfo] = useState({
+    type: 'bar',
+    data: {
+      labels: [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ],
+      datasets: [
+        {
+          label: "Expenses",
+          backgroundColor: [
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+          ],
+          borderColor: [
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(54, 162, 235, 1)",
+          ],
+          borderWidth: 1,
+          data: barGraphData,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            // Include a dollar sign in the ticks
+            callback: function (value, index, ticks) {
+              return "$" + value;
+            },
+          },
+        },
+        x: {
+          type: "category",
+          categories: [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ],
+          grid: {
+            display: true,
+          },
+          ticks: {
+            font: {
+              size: 12,
+            },
+            color: "rgba(255, 255, 255, 0.6)",
+          },
+        },
+      },
+      plugins: {
+        legend: {
+          display: true,
+        },
+      },
+      maintainAspectRatio: false,
+    }
+  });
+  const [barInstance, setBarInstance] = useState(null);
+
+
+
+  
+
+  const monthNumToName = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December",
+  };
 
   // Register the scales
   Chart.register(...registerables);
-  const data = {
-    labels: [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ],
-    datasets: [
-      {
-        label: "Expenses",
-        backgroundColor: [
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-        ],
-        borderColor: [
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(54, 162, 235, 1)",
-        ],
-        borderWidth: 1,
-        data: [
-          1100, 1120, 1100, 1000, 1210, 1200, 1100, 1320, 1230, 1340, 1150,
-          1160,
-        ],
-      },
-    ],
-  };
 
   useEffect(() => {
     setIsLoading(!isLoaded);
-  }, [isLoaded]);
+  }, [isLoaded])
+  useEffect(() => {
+    const checkPastMonths = async () => {
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonthNumeric = currentDate.getMonth() + 1;
+      const currentMonth = (currentDate.getMonth() + 1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false });
+      for(let i = 1; i <= currentMonthNumeric; i++){
+        const token = await getToken({ template: "codehooks" });
+        console.log(i.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })+"-"+currentYear);
+        let ithMonth = await getPastExpensesByDate(token, userId, i.toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })+"-"+currentYear)
+        if(!ithMonth || ithMonth.length == 0) barGraphData[i - 1] = 0;
+        barGraphData[i] = ithMonth.reduce((acc, ith) => {
+          return acc + parseFloat(ith.amount);
+        }, 0);
+      }
+      const token = await getToken({ template: "codehooks" });
+      const activePlan = (await getAllActivePlans(token, userId))[0];
+      console.log(activePlan);
+      
+      const projectedCost = activePlan ? await getToken({ template: "codehooks" }).then(async (token) => {
+        return await getSpecificPlannedExpenses(token, userId, activePlan._id).then(
+          (res) => {
+            return res.reduce((acc, entry) => {
+              return acc + parseFloat(entry.amount)
+            }, 0);
+          }
+        );
+      }) : 0;
+      
+      for(let i = currentMonthNumeric + 1; i <= 12; i++){
+        barGraphData[i - 1] = projectedCost;
+      }
+      console.log(barGraphData);
+      setBarGraphLoad(false);
+    }
+    checkPastMonths().then(setBarGraphData(barGraphData));
+    
+  }, [barGraphLoad]);
 
-  const options = {
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          // Include a dollar sign in the ticks
-          callback: function (value, index, ticks) {
-            return "$" + value;
-          },
-        },
-      },
-      x: {
-        type: "category",
-        categories: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ],
-        grid: {
-          display: true,
-        },
-        ticks: {
-          font: {
-            size: 12,
-          },
-          color: "rgba(255, 255, 255, 0.6)",
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        display: true,
-      },
-    },
-    maintainAspectRatio: false,
-  };
+  useEffect(() => {
+    let tempInfo = barInfo;
+    tempInfo.data.datasets[0].data = barGraphData;
+    setBarInfo(tempInfo);
+    console.log("tempInfo: ");
+    console.log(tempInfo);
+  }, [barGraphData])
 
   const donutdata = {
     labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
@@ -221,6 +292,7 @@ export default function HomePage() {
           </div></>;
   else if (isLoaded && !userId) router.push("/");
   else {
+    console.log(barInfo.data);
     return (
       <>
       {isLoading && (
@@ -248,7 +320,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="my-5">
-                <Bar data={data} options={options} />
+                <Bar data={barInfo.data} options={barInfo.options} />
               </div>
             </Card.Body>
           </Card>

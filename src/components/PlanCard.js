@@ -14,15 +14,17 @@ import {
   Button,
 } from "react-bootstrap";
 
-export default function PlanCard({name,expenditure,summaryData,activeStatus, id}) {
+export default function PlanCard({name,expenditure,labels,spendingData,summaryData,activeStatus, id}) {
     Chart.register(...registerables);
     const router = useRouter();
     const data = {
-        labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
+        // labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
+        labels: labels,
         datasets: [
           {
             label: "Spending Summary",
-            data: [20, 10, 30, 15, 5, 20],
+            // data: [20, 10, 30, 15, 5, 20],
+            data: spendingData,
             backgroundColor: [
               "#FF6384",
               "#36A2EB",

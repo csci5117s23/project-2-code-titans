@@ -24,97 +24,68 @@ import PlanCard from "@/components/PlanCard";
 
 export default function PlansPage() {
   const [plans, setNewPlans] = useState([]);
+  const [planNames,setPlanNames] = useState([]);
+  const [spendingData,setSpendingData] = useState([]);
+  const [nameToSpendingData,setNameToSpendingData] = useState([]);
   const [totalExpenditure, setTotalExpenditure] = useState(0);
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const getTotalExp = async (planId) => {
+    const getTotalExp = async (plan) => {
       return await getToken({ template: "codehooks" }).then(async (token) => {
-        return await getSpecificPlannedExpenses(token, userId, planId).then((res) => {
+        return await getSpecificPlannedExpenses(token, userId, plan._id).then((res) => {
           let totalExp = 0;
+          const planNames = [];
+          const spendingData = [];
           res.map((entry) => {
-            console.log(entry.amount);
+            console.log("entry.amount: " + entry.amount);
+            console.log("entry.name: " + entry.name);
+            planNames.push(entry.name);
+            spendingData.push(entry.amount);
+            console.log(planNames);
+            console.log(spendingData);
             totalExp += entry.amount;
           });
           console.log("total exp: " + totalExp);
-          return totalExp;
+          return {
+            totalExp: totalExp.toFixed(2),
+            planNames: planNames,
+            spendingData: spendingData
+          };
         });
       });
     }
+  
     getToken({ template: "codehooks" }).then(async (token) => {
       const res = await getAllPlans(token, userId);
       console.log("res1: " + res.length);
       if (res.length > 0){
-      setNewPlans(await Promise.all(res.map(async (plan) => {
-        let totalExp = await getTotalExp(plan._id)
-        console.log("we made it here with totalExp: " + totalExp);
-        return(
-        <Col xs={12} lg={4}>
-          <PlanCard
-            name={plan.name}
-            expenditure={totalExp.toFixed(2)}
-            summaryData={"yeah and?"}
-            id={plan._id}
-            activeStatus={false}
-          />
-        </Col>
-      )})));
-          }
+        setNewPlans(await Promise.all(res.map(async (plan) => {
+          const { totalExp, planNames, spendingData } = await getTotalExp(plan);
+          console.log("we made it here with totalExp: " + totalExp);
+          return(
+            <Col xs={12} lg={4}>
+              <PlanCard
+                name={plan.name}
+                expenditure={totalExp}
+                labels={planNames}
+                spendingData={spendingData}
+                summaryData={"yeah and?"}
+                id={plan._id}
+                activeStatus={false}
+              />
+            </Col>
+          );
+        })));
+      }
     });
-    
   }, [router, isLoaded]);
-
-  // async function getPlanExpenseInformation(){
-  //   getToken({ template: "codehooks" }).then(async (token) => {
-  //     const res =  await getAllPlans(token, userId);
-  //     console.log("Ressudeep: ");
-  //     console.log(res);
-  //     // await getSinglePlannedExpense(token, userId, plannedExpenseId)
-  //   });
-  // }
+  
 
   if (!isLoaded) return <></>;
   else if (isLoaded && !userId) router.push("/");
   else {
-    console.log("Else reached. plans: ");
-    console.log(plans);
-    // console.log("plans[0]");
-    // console.log(plans[0]);
-
-    // getToken({ template: "codehooks" }).then(async (token) => {
-    //   (getAllPlans(token, userId)).then((data) => {
-    //     // console.log("data[0]._id");
-    //     // console.log(data[0]._id); //Id of first plan
-    //     data.map((plan) => {
-    //       // console.log("plan._id: " + plan._id);
-    //       (getAllPlannedExpenses(token,userId).then((res) => {
-    //         console.log("res: ");
-    //         console.log(res);
-    //         res.map((entry) => {
-    //           // console.log("entry: ");
-    //           // console.log(entry);
-    //           console.log("entry.amount: " + entry.amount);
-    //           console.log("entry.name: " + entry.name);
-    //           // totalExp += entry.amount;
-    //         })
-    //       }));
-    //       // (getSinglePlannedExpense(token,userId,plan._id).then((res) => {
-    //       //   console.log("res: ");
-    //       //   console.log(res);
-    //       //   setTotalExpenditure(res);
-    //       //   console.log("expenditure: " + {expenditure});
-    //       // }));
-    //     })
-    //   });
-    //   // console.log("res[0]._id");
-    //   // console.log(res[0]._id);
-    // });
-
-    // getToken({ template: "codehooks" }).then(async (token) => {
-    //   const data = await getSpecificPlannedExpenses(token,userId,data[0]); //First planned expense
-    // });
-
     return (
       <>
         <Head>

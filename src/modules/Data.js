@@ -118,7 +118,7 @@ export async function addPastExpense(authToken, pastExpense) {
     return result;
 }
 
-export async function deletePlans(authToken, userId, planId) {
+export async function deletePlan(authToken, userId, planId) {
     const result = await fetch(`${backendBase}/deletePlan?userId=${userId}&_id=${planId}`,{
         'method':'DELETE',
         'headers': {

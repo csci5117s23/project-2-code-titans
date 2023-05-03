@@ -34,19 +34,24 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
   useEffect( () => {
     if(expenseId && expenseId.length > 0){
       getToken({ template: "codehooks" }).then(async (token) => {
-        const res =  await getSinglePlannedExpense(token, userId, expenseId);
-        setName(res.name);
-        setAmount(res.amount);
-        if(res.name == "Auto" && res.carVin){
-          setVinOrPrice("VIN");
-          setCarInfo({year: res.carYear, make: res.carMark, model: res.carModel});
+        async function process() {
+          const res =  (await getSinglePlannedExpense(token, userId, expenseId))[0];
+          return res;
         }
-        if(res.apr){
-          setAPR(res.apr);
-          setTerm(res.term);
-          setDownpayment(res.downpayment);
-        }
-        setAmount(res.amount);
+        process().then((res) => {
+          setName(res.name);
+          setAmount(res.amount);
+          if(res.name == "Auto" && res.carVin){
+            setVinOrPrice("VIN");
+            setCarInfo({year: res.carYear, make: res.carMark, model: res.carModel});
+          }
+          if(res.apr)
+            setAPR(res.apr);
+          if(res.term)
+            setTerm(res.term);
+          if(res.downpayment)
+            setDownpayment(res.downpayment);
+        });
       });
     }
   }, [expenseId])
@@ -57,6 +62,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
 
   const handleSaveChanges = async () => {
     // Do something with the expense data
+    if(name.trim()==="" || amount===null || amount===undefined || dueDate==="") return;
     const token = await getToken({ template: "codehooks" })
     let savedChanges = {
       name: name,
@@ -168,9 +174,10 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                 borderRadius: "11px",
               }}
               value={vin}
+              required
               onChange={(e) => setVin(e.target.value)}
             />
-            <Button className="my-3" onClick={handleLookup}>
+            <Button className="my-3" type="submit" onClick={handleLookup}>
               Lookup
             </Button>
           </Form.Group>
@@ -210,10 +217,6 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
             </Form.Label>
             <Form.Control
               type="number"
-              style={{
-                background: "#F7E7D5",
-                borderRadius: "11px",
-              }}
               placeholder="Enter auto price"
               value={customAutoPrice}
               required
@@ -257,10 +260,6 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               </Form.Label>
               <Form.Control
                 type="number"
-                style={{
-                  background: "#F7E7D5",
-                  borderRadius: "11px",
-                }}
                 placeholder="Enter downpayment"
                 value={downpayment}
                 required
@@ -273,10 +272,6 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               </Form.Label>
               <Form.Control
                 type="number"
-                style={{
-                  background: "#F7E7D5",
-                  borderRadius: "11px",
-                }}
                 placeholder="Enter APR"
                 value={APR}
                 required
@@ -290,10 +285,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               <div className="input-group">
                 <Form.Control
                   type="number"
-                  style={{
-                    background: "#F7E7D5",
-                    borderRadius: "11px",
-                  }}
+                  required
                   placeholder="Enter term"
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
@@ -303,14 +295,17 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                 </div>
               </div>
             </Form.Group>
-            or Manually...
+            or Automatically...
             <Button
-              style={{backgroundColor: "#47B1ED",
-                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                      width: "fit-content",
-                      border: "none"}}
+              style={{
+                backgroundColor: "#47B1ED",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                width: "fit-content",
+                border: "none"
+              }}
               className="my-3"
               variant="primary"
+              type="submit"
               onClick={handleComputeCarAPR}>
               Compute Costs
             </Button>
@@ -318,7 +313,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
         )}
         {financeOrFull ===
           "Full" && (
-            <Button className="my-3" variant="primary" onClick={handleFullPaymentCar}>
+            <Button className="my-3" type="submit" variant="primary" onClick={handleFullPaymentCar}>
               Compute Costs
             </Button>
           )}
@@ -359,6 +354,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               <Form.Control
                 type="number"
                 value={homePrice}
+                required
                 onChange={(e) => setHomePrice(e.target.value)}
               />
             </Form.Group>
@@ -369,6 +365,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               <Form.Control
                 type="number"
                 value={downpayment}
+                required
                 onChange={(e) => setDownpayment(e.target.value)}
               />
             </Form.Group>
@@ -379,6 +376,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               <Form.Control
                 type="number"
                 value={APR}
+                required
                 onChange={(e) => setAPR(e.target.value)}
               />
             </Form.Group>
@@ -390,6 +388,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                 <Form.Control
                   type="number"
                   value={term}
+                  required
                   onChange={(e) => setTerm(e.target.value)}
                 />
                 <div className="input-group-append">
@@ -404,6 +403,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                       border: "none"}}
               className="my-3"
               variant="primary"
+              type="submit"
               onClick={handleOwnHomeCosts}>
               Compute Costs
             </Button>
@@ -418,11 +418,8 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
               </Form.Label>
               <Form.Control
                 type="number"
-                style={{
-                  background: "#F7E7D5",
-                  borderRadius: "11px",
-                }}
                 value={rent}
+                required
                 onChange={(e) => setRent(e.target.value)}
               />
             </Form.Group>
@@ -433,6 +430,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                       border: "none"}}
               className="my-3"
               variant="primary"
+              type="submit"
               onClick={handleRentCosts}>
               Compute Costs
             </Button>
@@ -445,35 +443,19 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
 
   return (
     <Modal show={show} onHide={handleClose}>
-      <Modal.Header style={{ backgroundColor: "#F8F4F1" }} closeButton>
-        <Modal.Title>
-          <h1>Add Expense</h1>
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body style={{ backgroundColor: "#F8F4F1" }}>
-        <Container fluid className="p-0">
-          <Row>
-            <Col>
-              <Form.Group controlId="planName">
-                <Form.Label>
-                  <span className="light-brown">Name</span>
-                </Form.Label>
-                <Form.Control
-                  type="text"
-                  style={{
-                    background: "#F7E7D5",
-                    borderRadius: "11px",
-                  }}
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value)
-                  }}
-                  disabled={isDisabled}
-                  required
-                />
-                <>
+      <Form>
+        <Modal.Header style={{ backgroundColor: "#F8F4F1" }} closeButton>
+          <Modal.Title>
+            <h1>Add Expense</h1>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ backgroundColor: "#F8F4F1" }}>
+          <Container fluid className="p-0">
+            <Row>
+              <Col>
+                <Form.Group controlId="planName">
                   <Form.Label>
-                    <span className="light-brown">Monthly Expense ($)</span>
+                    <span className="light-brown">Name</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -481,65 +463,89 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
                       background: "#F7E7D5",
                       borderRadius: "11px",
                     }}
-                    placeholder="Enter manually or compute costs below"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                    }}
+                    disabled={isDisabled}
                     required
                   />
-                </>
-                <Form.Label>
-                  <span className="light-brown">Zip Code</span>
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  style={{
-                    background: "#F7E7D5",
-                    borderRadius: "11px",
-                  }}
-                  placeholder="Enter zip code"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  required
-                />
-              </Form.Group>
-              {expense === "Auto" && renderAutoFields()}
-              {expense === "Auto" && renderAutoPaymentFields()}
-              {expense === "Home" && renderHomeFields()}
-            </Col>
-          </Row>
-        </Container>
-      </Modal.Body>
-      <Modal.Footer style={{ backgroundColor: "#F8F4F1" }}>
-      <p style={{ color: "#876C44"}}>Due Date</p>
-  <Form.Group controlId="dueDate">
-    <Form.Control
-      type="date"
-      style={{
-        background: "#F7E7D5",
-        borderRadius: "11px",
-      }}
-      value={dueDate}
-      onChange={(e) => setDueDate(e.target.value)}
-    />
-  </Form.Group>
-  <Button
-    style={{boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-            width: "fit-content",
-            border: "none"}}
-    variant="secondary"
-    onClick={handleClose}>
-    Close
-  </Button>
-  <Button
-    style={{backgroundColor: "#47B1ED",
-                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                      width: "fit-content",
-                      border: "none"}}
-    variant="primary"
-    onClick={handleSaveChanges}>
-    Create Expense
-  </Button>
-</Modal.Footer>
+                  <>
+                    <Form.Label>
+                      <span className="light-brown">Monthly Expense ($)</span>
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      style={{
+                        background: "#F7E7D5",
+                        borderRadius: "11px",
+                      }}
+                      placeholder="Enter manually or compute costs below"
+                      value={amount}
+                      required
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
+                  </>
+                  <Form.Label>
+                    <span className="light-brown">Zip Code</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    style={{
+                      background: "#F7E7D5",
+                      borderRadius: "11px",
+                    }}
+                    placeholder="Enter zip code"
+                    value={zipCode}
+                    required
+                    onChange={(e) => setZipCode(e.target.value)}
+                  />
+                </Form.Group>
+                {expense === "Auto" && renderAutoFields()}
+                {expense === "Auto" && renderAutoPaymentFields()}
+                {expense === "Home" && renderHomeFields()}
+              </Col>
+            </Row>
+          </Container>
+        </Modal.Body>
+        <Modal.Footer style={{ backgroundColor: "#F8F4F1" }}>
+          <p style={{ color: "#876C44" }}>Due Date</p>
+          <Form.Group controlId="dueDate">
+            <Form.Control
+              type="date"
+              style={{
+                background: "#F7E7D5",
+                borderRadius: "11px",
+              }}
+              required
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
+          </Form.Group>
+          <Button
+            style={{
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              width: "fit-content",
+              border: "none"
+            }}
+            variant="secondary"
+            onClick={handleClose}>
+            Close
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "#47B1ED",
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              width: "fit-content",
+              border: "none"
+            }}
+            variant="primary"
+            type="submit"
+            onClick={handleSaveChanges}>
+            Create Expense
+          </Button>
+        </Modal.Footer>
+      </Form>
     </Modal>
   );
 };

@@ -18,7 +18,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
-import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan } from "@/modules/Data";
+import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPastExpense } from "@/modules/Data";
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -162,6 +162,8 @@ export default function NewPlanPage() {
         expenseId={customId}
         planId={id}
         location={zipCode}
+        addExpense={addPlannedExpense}
+        editExpense={editPlannedExpense}
       />
       <Head>
         <title>{inProgress ? "New Plan" : "Edit Plan"}</title>

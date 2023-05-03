@@ -224,10 +224,11 @@ export default function HomePage() {
       for(let i = currentMonthNumeric + 1; i <= 12; i++){
         barGraphData[i - 1] = projectedCost;
       }
+      setBarGraphData(barGraphData)
       console.log(barGraphData);
       setBarGraphLoad(false);
     }
-    checkPastMonths().then(setBarGraphData(barGraphData));
+    checkPastMonths()
     
   }, [barGraphLoad]);
 
@@ -237,7 +238,7 @@ export default function HomePage() {
     setBarInfo(tempInfo);
     console.log("tempInfo: ");
     console.log(tempInfo);
-  }, [barGraphData])
+  }, [barGraphData, barGraphLoad])
 
   const donutdata = {
     labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],

@@ -4,7 +4,7 @@ import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location }) => {
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, }) => {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();

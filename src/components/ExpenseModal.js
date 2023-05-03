@@ -4,7 +4,7 @@ import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location }) => {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
@@ -50,6 +50,10 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
       });
     }
   }, [expenseId])
+
+  useEffect(() => {
+    setZipCode(location);
+  }, [location])
 
   const handleSaveChanges = async () => {
     // Do something with the expense data
@@ -103,6 +107,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
   };
 
   const handleComputeCarAPR = async () => {
+    console.log("Clicked!");
     const token = await getToken({ template: "codehooks" });
     const res = await getCarLoanPayments(token, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice) - downpayment, APR, term);
     setAmount(parseFloat(res));
@@ -209,7 +214,9 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                 background: "#F7E7D5",
                 borderRadius: "11px",
               }}
+              placeholder="Enter auto price"
               value={customAutoPrice}
+              required
               onChange={(e) => setCustomAutoPrice(e.target.value)}
             />
           </Form.Group>
@@ -250,7 +257,13 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
               </Form.Label>
               <Form.Control
                 type="number"
+                style={{
+                  background: "#F7E7D5",
+                  borderRadius: "11px",
+                }}
+                placeholder="Enter downpayment"
                 value={downpayment}
+                required
                 onChange={(e) => setDownpayment(e.target.value)}
               />
             </Form.Group>
@@ -260,7 +273,13 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
               </Form.Label>
               <Form.Control
                 type="number"
+                style={{
+                  background: "#F7E7D5",
+                  borderRadius: "11px",
+                }}
+                placeholder="Enter APR"
                 value={APR}
+                required
                 onChange={(e) => setAPR(e.target.value)}
               />
             </Form.Group>
@@ -271,6 +290,11 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
               <div className="input-group">
                 <Form.Control
                   type="number"
+                  style={{
+                    background: "#F7E7D5",
+                    borderRadius: "11px",
+                  }}
+                  placeholder="Enter term"
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
                 />
@@ -279,7 +303,15 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                 </div>
               </div>
             </Form.Group>
-            <Button className="my-3" variant="primary" onClick={handleComputeCarAPR}>
+            or Manually...
+            <Button
+              style={{backgroundColor: "#47B1ED",
+                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                      width: "fit-content",
+                      border: "none"}}
+              className="my-3"
+              variant="primary"
+              onClick={handleComputeCarAPR}>
               Compute Costs
             </Button>
           </>
@@ -365,7 +397,14 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                 </div>
               </div>
             </Form.Group>
-            <Button className="my-3" variant="primary" onClick={handleOwnHomeCosts}>
+            <Button
+              style={{backgroundColor: "#47B1ED",
+                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                      width: "fit-content",
+                      border: "none"}}
+              className="my-3"
+              variant="primary"
+              onClick={handleOwnHomeCosts}>
               Compute Costs
             </Button>
           </>
@@ -379,11 +418,22 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
               </Form.Label>
               <Form.Control
                 type="number"
+                style={{
+                  background: "#F7E7D5",
+                  borderRadius: "11px",
+                }}
                 value={rent}
                 onChange={(e) => setRent(e.target.value)}
               />
             </Form.Group>
-            <Button className="my-3" variant="primary" onClick={handleRentCosts}>
+            <Button
+              style={{backgroundColor: "#47B1ED",
+                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                      width: "fit-content",
+                      border: "none"}}
+              className="my-3"
+              variant="primary"
+              onClick={handleRentCosts}>
               Compute Costs
             </Button>
             </>
@@ -423,7 +473,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                 />
                 <>
                   <Form.Label>
-                    <span className="light-brown">Expense Amount ($)</span>
+                    <span className="light-brown">Monthly Expense ($)</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -431,6 +481,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                       background: "#F7E7D5",
                       borderRadius: "11px",
                     }}
+                    placeholder="Enter manually or compute costs below"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     required
@@ -445,6 +496,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
                     background: "#F7E7D5",
                     borderRadius: "11px",
                   }}
+                  placeholder="Enter zip code"
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value)}
                   required
@@ -470,10 +522,21 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId }) => {
       onChange={(e) => setDueDate(e.target.value)}
     />
   </Form.Group>
-  <Button variant="secondary" onClick={handleClose}>
+  <Button
+    style={{boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+            width: "fit-content",
+            border: "none"}}
+    variant="secondary"
+    onClick={handleClose}>
     Close
   </Button>
-  <Button variant="primary" onClick={handleSaveChanges}>
+  <Button
+    style={{backgroundColor: "#47B1ED",
+                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                      width: "fit-content",
+                      border: "none"}}
+    variant="primary"
+    onClick={handleSaveChanges}>
     Create Expense
   </Button>
 </Modal.Footer>

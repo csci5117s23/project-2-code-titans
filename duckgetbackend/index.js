@@ -12,6 +12,7 @@ const PlanYup = object({
   name: string().required(),
   userId: string().required(),
   location: string().required(),
+  projectedIncome: number().default(0),
   isActive: boolean().required(),
   inProgress: boolean().optional()
 })

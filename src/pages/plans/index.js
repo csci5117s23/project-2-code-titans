@@ -74,7 +74,7 @@ export default function PlansPage() {
               }}
               onClick={async () => {
                 const token = await getToken({ template: "codehooks" });
-                const res = await addPlan(token, {name: 'fake', userId: userId, location: '00000', isActive: false, inProgress: true});
+                const res = await addPlan(token, {name: ' ', userId: userId, location: '00000', isActive: false, inProgress: true});
                 router.push('/plans/' + res._id);
               }}
             >

@@ -21,6 +21,7 @@ strong{
 
 .expenses img {
   margin-left: 1rem;
+  border-radius: 15px;
 }
 .main-button {
   background-color: rgba(71, 177, 237, 0.87) !important;

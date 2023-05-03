@@ -5,6 +5,9 @@ import "chart.js/auto";
 import { Chart, registerables } from "chart.js";
 import { useRouter } from "next/router";
 import {
+  
+} from "@/modules/Data";
+import {
   Container,
   Nav,
   Navbar,
@@ -14,7 +17,7 @@ import {
   Button,
 } from "react-bootstrap";
 
-export default function PlanCard({name,expenditure,labels,spendingData,summaryData,activeStatus, id}) {
+export default function PlanCard({name,expenditure,labels,spendingData,summaryData,activeStatus, activate, id}) {
     Chart.register(...registerables);
     const router = useRouter();
     const options = {
@@ -47,7 +50,6 @@ export default function PlanCard({name,expenditure,labels,spendingData,summaryDa
         options: options
       };
     
-      
     
     return (
      <Card className="mb-3 rounded-5 shadow">
@@ -59,11 +61,11 @@ export default function PlanCard({name,expenditure,labels,spendingData,summaryDa
           </Card.Subtitle>
           <h3 style={{color: "#044303"}}>${expenditure}</h3>
           {activeStatus ? (
-            <Button variant="danger" className="mt-3" style={{background: "rgba(59, 95, 116, 0.87)", border: "none"}}>
-              Deactivate
+            <Button  variant="danger" className="mt-3" style={{background: "rgba(59, 95, 116, 0.87)", border: "none"}}>
+              Active
             </Button>
           ) : (
-            <Button variant="success" className="mt-3" style={{backgroundColor: "#47B1ED", border: "none"}}>
+            <Button onClick={() => activate(id)} variant="success" className="mt-3" style={{backgroundColor: "#47B1ED", border: "none"}}>
             Activate
             </Button>
           )}

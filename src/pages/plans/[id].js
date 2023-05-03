@@ -17,7 +17,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
-import { editPlan, getSpecificPlannedExpenses, deletePlan } from "@/modules/Data";
+import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan} from "@/modules/Data";
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState("");
@@ -26,6 +26,7 @@ export default function NewPlanPage() {
   const [zipCode, setZipCode] = useState("");
   const [customId, setCustomId] = useState(null);
   const [createdExpenses, setCreatedExpenses] = useState([]);
+  const [editingExpense, setEditingExpense] = useState(true);
   const router = useRouter();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
@@ -51,15 +52,25 @@ export default function NewPlanPage() {
 
   useEffect(() => {
     getToken({ template: "codehooks" }).then(async (token) => {
+      // console.log(userId)
+      // console.log(id)
       const res =  await getSpecificPlannedExpenses(token, userId, id);
-      console.log("res: " + res.length)
+      setEditingExpense(false)
+      // console.log("res: " + res.length)
       setCreatedExpenses(res);
       if(createdExpenses && createdExpenses.length > 0)
         console.log(id + " expenses: "+ userId + " : " + createdExpenses[0].name);
+
+      const data =  await getPlan(token, userId, id);
+      if (data.length > 0) {
+        setPlanName(data[0].name)
+        //add projected yearly income
+        setZipCode(data[0].location)
+      }
       setCustomId(null);  
     });
     
-  }, [showModal, router])
+  }, [isLoaded, router,editingExpense])
 
   const handleExpenseClick = (expense) => {
     setSelectedExpense(expense);
@@ -68,6 +79,7 @@ export default function NewPlanPage() {
 
   const handleModalClose = () => {
     setShowModal(false);
+    setEditingExpense(true)
     setSelectedExpense("");
   };
 

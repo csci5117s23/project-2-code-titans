@@ -36,7 +36,8 @@ export default function NewPlanPage() {
       name: planName,
       userId: userId,
       location: zipCode,
-      isActive: false
+      isActive: false,
+      inProgress: false
     };
     const res = await editPlan(token, userId, id, savedChanges);
     router.push('/plans')

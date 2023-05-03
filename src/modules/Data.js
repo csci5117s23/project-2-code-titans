@@ -32,6 +32,14 @@ export async function getAllInactivePlans(authToken, userId) {
     return await result.json();
 }
 
+export async function getAllInProgressPlans(authToken, userId) {
+    const result = await fetch(`${backendBase}/plans?userId=${userId}&inProgress=true`,{
+        'method':'GET',
+        'headers': {'Authorization': 'Bearer ' + authToken}
+    })
+    return await result.json();
+}
+
 export async function getAllPlannedExpenses(authToken, userId) {
     const result = await fetch(`${backendBase}/plannedExpenses?userId=${userId}`,{
         'method':'GET',
@@ -110,7 +118,7 @@ export async function addPastExpense(authToken, pastExpense) {
     return result;
 }
 
-export async function deletePlan(authToken, userId, planId) {
+export async function deletePlans(authToken, userId, planId) {
     const result = await fetch(`${backendBase}/deletePlan?userId=${userId}&_id=${planId}`,{
         'method':'DELETE',
         'headers': {
@@ -119,6 +127,21 @@ export async function deletePlan(authToken, userId, planId) {
         }
     })
     return await result.json();
+}
+
+export async function deleteAllInProgressPlans(authToken, userId) {
+    const result = getAllInProgressPlans(authToken,userId).then(async (res) => {
+        res.map(async (plan) => (
+            await fetch(`${backendBase}/deletePlan?userId=${userId}&_id=${plan._id}`,{
+                'method':'DELETE',
+                'headers': {
+                    'Authorization': 'Bearer ' + authToken,
+                    'Content-Type': 'application/json'
+                }
+            })
+        ))
+    })
+    return await result;
 }
 
 export async function deletePlannedExpense(authToken, userId, plannedExpenseId) {

@@ -19,7 +19,7 @@ import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
 
-import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPlannedExpense, deletePlannedExpense, getSinglePlannedExpense } from "@/modules/Data";
+import { editPlan, getPastExpensesByDate, deletePlan, getPlan, addPastExpense, editPastExpense, deletePastExpense, getSinglePastExpense } from "@/modules/Data";
 
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +29,6 @@ export default function NewPlanPage() {
   const [projectedYearlyIncome, setProjectedYearlyIncome] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [active, setActive] = useState(false);
-  const [inProgress, setInProgress] = useState(false);
   const [customId, setCustomId] = useState(null);
   const [createdExpenses, setCreatedExpenses] = useState([]);
   const [editedExpenses, setEditedExpenses] = useState(true);
@@ -37,70 +36,34 @@ export default function NewPlanPage() {
   const router = useRouter();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
-  const { id } = router.query;
+  const { date } = router.query;
 
   const updateChanges = async () => {
     // console.log("location: " + location);
     setIsLoading(true);
-    if(planName.trim()==="" || zipCode.trim()==="" || projectedYearlyIncome.trim()==="") return;
-    const token = await getToken({ template: "codehooks" })
-    let savedChanges = {
-      name: planName,
-      userId: userId,
-      location: zipCode,
-      projectedIncome: projectedYearlyIncome,
-      isActive: active,
-      inProgress: false
-    };
-    router.push('/plans');
-    const res = editPlan(token, userId, id, savedChanges).then(() =>{});
+    router.push('/home');
     setIsLoading(false);
-  }
-
-  const deleteChanges = async () => {
-    const token = await getToken({ template: "codehooks" })
-    await deletePlan(token, userId, id);
-    router.push('/plans')
   }
 
   useEffect(() => {
     setIsLoading(true);
     getToken({ template: "codehooks" }).then(async (token) => {
-      const res =  await getSpecificPlannedExpenses(token, userId, id);
+      const res =  await getPastExpensesByDate(token, userId, date);
       console.log("res: " + res.length)
       setCreatedExpenses(res);
       if(res && res.length > 0)
-        console.log(id + " expenses: "+ userId + " : " + res[0].name);
+        console.log(date + " expenses: "+ userId + " : " + res[0].name);
       else
         router.push('/404');
+
+      setPlanName(date);
+      setZipCode("");
       setEditedExpenses(false);
       setIsLoading(false);
     });
     
   }, [showModal, router, isLoaded, editedExpenses])
 
-  useEffect(() => {
-    setIsLoading(true);
-    getToken({ template: "codehooks" }).then(async (token) => {
-        async function process() {
-            if(id) {
-                const res = (await getPlan(token,userId,id))[0];
-                console.log("id: " + id);
-                return res;
-            }
-        }
-        process().then((res) => {
-            setPlanName(res.inProgress ? "" : res.name);
-            setZipCode(res.inProgress ? "" : res.location);
-            setProjectedYearlyIncome(res.inProgress ? "" : res.projectedIncome);
-            setActive(res.isActive);
-            setInProgress(res.inProgress);
-        }).catch(() => {
-            console.log("404");
-        })
-        setIsLoading(false);
-    })
-  }, [router, isLoaded])
 
   const handleExpenseClick = (expense) => {
     setEditingBool(false);
@@ -110,7 +73,6 @@ export default function NewPlanPage() {
 
   const handleExpenseEdit = (expense) => {
     setEditingBool(true);
-    console.log("editing bools");
     setSelectedExpense(expense);
     setShowModal(true);
   };
@@ -127,7 +89,7 @@ export default function NewPlanPage() {
 
   const handleExpenseDelete = async(plannedExpenseId) => {
     const token = await getToken({ template: "codehooks" });
-    deletePlannedExpense(token,userId,plannedExpenseId).then(() => setEditedExpenses(true));
+    deletePastExpense(token,userId,plannedExpenseId).then(() => setEditedExpenses(true));
   }
 
   const findZipCode = async (latitude, longitude) => {
@@ -177,15 +139,15 @@ export default function NewPlanPage() {
         expense={selectedExpense}
         handleClose={handleModalClose}
         expenseId={customId}
-        planId={id}
+        planId={date}
         location={zipCode}
-        addExpense={addPlannedExpense}
-        editExpense={editPlannedExpense}
-        getSingleExpense={getSinglePlannedExpense}
+        addExpense={addPastExpense}
+        editExpense={editPastExpense}
+        getSingleExpense={getSinglePastExpense}
         editing={editingBool}
       />
       <Head>
-        <title>{inProgress ? "New Plan" : "Edit Plan"}</title>
+        <title>{date + " Summary"}</title>
         <meta name="description" content="Generated by create next app" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/duckget-logo.png" />
@@ -210,7 +172,7 @@ export default function NewPlanPage() {
                   className="text-center text-wrap"
                   style={{ color: "#472B00" }}
                 >
-                  {inProgress ? "New Plan" : "Edit Plan"}
+                  {date + " Summary"}
                 </h1>
               </Col>
               <Col
@@ -234,8 +196,8 @@ export default function NewPlanPage() {
                   <Form.Control
                     type="text"
                     value={planName}
-                    onChange={(e) => setPlanName(e.target.value)}
                     placeholder="Enter Plan Name"
+                    disabled
                     required
                     style={{
                         background: "#F7E7D5",
@@ -243,20 +205,6 @@ export default function NewPlanPage() {
                     }}
                     />
                   <Form.Control.Feedback></Form.Control.Feedback>
-                  <Form.Label>
-                    <span className="light-brown">Projected Yearly Income</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={projectedYearlyIncome}
-                    onChange={(e) => setProjectedYearlyIncome(e.target.value)}
-                    placeholder="Enter Projected Yearly Income"
-                    required
-                    style={{
-                        background: "#F7E7D5",
-                        borderRadius: "11px",
-                    }}
-                    />
                   <Form.Label>
                     <span className="light-brown">Zip Code</span>
                   </Form.Label>
@@ -345,22 +293,7 @@ export default function NewPlanPage() {
             }}
             onClick={updateChanges}
             >
-            <h1>Save</h1>
-          </Button>
-          <Button
-            className="d-block mx-auto"
-            style={{
-                backgroundColor: "#FF1D18",
-                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                borderRadius: "10px",
-                width: "30%",
-                height: "80px",
-                border: "none",
-                marginBottom: "30px",
-            }}
-            onClick={deleteChanges}
-            >
-            <h1>Delete</h1>
+            <h1>Done</h1>
           </Button>
         </div>
     </Form>

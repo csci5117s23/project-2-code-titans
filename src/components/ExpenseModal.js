@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Container, Row, Col, Form } from "react-bootstrap";
-import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice, getSinglePlannedExpense, addPlannedExpense, editPlannedExpense } from "@/modules/Data";
+import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice, getSinglePlannedExpense } from "@/modules/Data";
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing }) => {
+
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense  }) => {
+
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
@@ -33,12 +35,14 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
 
   useEffect( () => {
     if(expenseId && expenseId.length > 0){
+      console.log("expenseId: " + expenseId);
       getToken({ template: "codehooks" }).then(async (token) => {
         async function process() {
-          const res =  (await getSinglePlannedExpense(token, userId, expenseId))[0];
+          const res =  (await getSingleExpense(token, userId, expenseId))[0];
           return res;
         }
         process().then((res) => {
+          // console.log(res);
           setName(res.name);
           setAmount(res.amount);
           setDueDate(res.dueDate);
@@ -63,7 +67,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
 
   const handleSaveChanges = async () => {
     // Do something with the expense data
-    if(name.trim()==="" || amount===null || amount===undefined || dueDate==="") return;
+    if(name.trim()==="" || amount===null || amount===undefined || dueDate==="" || !amount) return;
     const token = await getToken({ template: "codehooks" })
     let savedChanges = {
       name: name,
@@ -85,15 +89,17 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
       savedChanges['term'] = term;
     if(downpayment)
       savedChanges['downpayment'] = downpayment;
-    if(expenseId){
+    if(editing && expenseId){
       console.log('expenseId: ' + expenseId);
-      await editPlannedExpense(token, userId, expenseId, savedChanges);
+      console.log(savedChanges);
+      await editExpense(token, userId, expenseId, savedChanges).then(() => {
+        handleClose();
+      });
+      
     }else{
-      await addPlannedExpense(token, savedChanges);
+      await addExpense(token, savedChanges);
+      handleClose();
     }
-    
-    
-    handleClose();
   };
 
   const handleVinOrPriceChange = (e) => {

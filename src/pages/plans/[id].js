@@ -28,6 +28,7 @@ export default function NewPlanPage() {
   const [inProgress, setInProgress] = useState(false);
   const [customId, setCustomId] = useState(null);
   const [createdExpenses, setCreatedExpenses] = useState([]);
+  const [editedExpenses, setEditedExpenses] = useState(true);
   const router = useRouter();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
@@ -45,8 +46,8 @@ export default function NewPlanPage() {
       isActive: active,
       inProgress: false
     };
-    const res = await editPlan(token, userId, id, savedChanges);
-    router.push('/plans')
+    router.push('/plans');
+    const res = editPlan(token, userId, id, savedChanges).then(() =>{});
   }
 
   const deleteChanges = async () => {
@@ -63,9 +64,10 @@ export default function NewPlanPage() {
       if(createdExpenses && createdExpenses.length > 0)
         console.log(id + " expenses: "+ userId + " : " + createdExpenses[0].name);
       setCustomId(null);  
+      setEditedExpenses(false);
     });
     
-  }, [showModal, router])
+  }, [showModal, router, isLoaded, editedExpenses])
 
   useEffect(() => {
     getToken({ template: "codehooks" }).then(async (token) => {
@@ -85,8 +87,6 @@ export default function NewPlanPage() {
         }).catch(() => {
             console.log("404");
         })
-        if(id) {
-        }
     })
   }, [router, isLoaded])
 
@@ -98,6 +98,7 @@ export default function NewPlanPage() {
   const handleModalClose = () => {
     setShowModal(false);
     setSelectedExpense("");
+    setEditedExpenses(true);
   };
 
   const handleBackButton = () => {

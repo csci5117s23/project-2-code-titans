@@ -17,7 +17,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
-import { editPlan, getSpecificPlannedExpenses } from "@/modules/Data";
+import { editPlan, getSpecificPlannedExpenses, deletePlan } from "@/modules/Data";
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState("");
@@ -41,6 +41,13 @@ export default function NewPlanPage() {
     const res = await editPlan(token, userId, id, savedChanges);
     router.push('/plans')
   }
+
+  const deleteChanges = async () => {
+    const token = await getToken({ template: "codehooks" })
+    await deletePlan(token, userId, id);
+    router.push('/plans')
+  }
+
   useEffect(() => {
     getToken({ template: "codehooks" }).then(async (token) => {
       const res =  await getSpecificPlannedExpenses(token, userId, id);
@@ -260,6 +267,21 @@ export default function NewPlanPage() {
             onClick={updateChanges}
           >
             <h1>Save</h1>
+          </Button>
+          <Button
+            className="d-block mx-auto"
+            style={{
+              backgroundColor: "#FF1D18",
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              borderRadius: "10px",
+              width: "30%",
+              height: "80px",
+              border: "none",
+              marginBottom: "30px",
+            }}
+            onClick={deleteChanges}
+          >
+            <h1>Delete</h1>
           </Button>
         </div>
       </div>

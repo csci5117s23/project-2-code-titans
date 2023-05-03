@@ -19,7 +19,7 @@ import Navigation from "@/components/Navigation";
 import Loader from "@/components/Loader";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { getAllPlans, getAllActivePlans, getAllPlannedExpenses,getPastExpensesByDate, getAllPlannedExpenses, getSinglePlannedExpense, getSpecificPlannedExpenses } from "@/modules/Data";
+import { getAllPlans, getAllActivePlans,getPastExpensesByDate, getSinglePlannedExpense, getSpecificPlannedExpenses } from "@/modules/Data";
 import { useRef } from "react";
 import Chartjs from 'chart.js';
 
@@ -32,6 +32,7 @@ export default function HomePage() {
   const [barGraphLoad, setBarGraphLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [barGraphRef, setBarGraphRef] = useState(useRef(null));
+  const [plans, setNewPlans] = useState([]);
   const [barInfo, setBarInfo] = useState({
     type: 'bar',
     data: {
@@ -135,7 +136,40 @@ export default function HomePage() {
 
 
 
-  
+  useEffect(() => {
+    const getTotalExp = async (plan) => {
+      return await getToken({ template: "codehooks" }).then(async (token) => {
+        return await getSpecificPlannedExpenses(token, userId, plan._id).then((res) => {
+          let totalExp = 0;
+          console.log("Planned expenses: ", res)
+          const nameToSpendingData = new Array();
+          res.map((entry) => {
+            const tempImgPath = "/" + entry.name.toLowerCase() + "Exp.png"
+            if (!nameToSpendingData.includes(tempImgPath))
+              nameToSpendingData.push("/" + entry.name.toLowerCase() + "Exp.png");
+            totalExp += entry.amount;
+          });
+          console.log("total exp: " + totalExp);
+          return {
+            totalExp: totalExp.toFixed(2),
+            nameToSpendingData: nameToSpendingData
+          };
+        });
+      });
+    }
+
+    getToken({ template: "codehooks" }).then(async (token) => {
+      const res = await getAllPlans(token, userId);
+      console.log("res1: " + JSON.stringify(res));
+      if (res.length > 0){
+        setNewPlans(await Promise.all(res.map(async (plan) => {
+          const planNames = plan.name;
+          const { totalExp, nameToSpendingData } = await getTotalExp(plan);
+          return([planNames,totalExp, nameToSpendingData]);
+        })));
+      }
+    });
+  }, [router, isLoaded]);
 
   const monthNumToName = {
     "01": "January",

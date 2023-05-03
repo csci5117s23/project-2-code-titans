@@ -19,9 +19,10 @@ import Navigation from "@/components/Navigation";
 import Loader from "@/components/Loader";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { getAllActivePlans, getPastExpensesByDate, getSpecificPlannedExpenses } from "@/modules/Data";
+import { getAllPlans, getAllActivePlans, getAllPlannedExpenses,getPastExpensesByDate, getAllPlannedExpenses, getSinglePlannedExpense, getSpecificPlannedExpenses } from "@/modules/Data";
 import { useRef } from "react";
 import Chartjs from 'chart.js';
+
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -233,51 +234,6 @@ export default function HomePage() {
   };
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const plans = [
-    {
-      title: "Plan 1",
-      expense: 1100,
-      image1: "/autoExp.png",
-      image2: "/homeExp.png",
-    },
-    {
-      title: "Plan 2",
-      expense: 1789,
-      image1: "/otherExp.png",
-      image2: "/homeExp.png",
-    },
-    {
-      title: "Plan 3",
-      expense: 2100,
-      image1: "https://via.placeholder.com/100x100",
-      image2: "https://via.placeholder.com/100x100",
-    },
-    {
-      title: "Plan 4",
-      expense: 1400,
-      image1: "https://via.placeholder.com/100x100",
-      image2: "https://via.placeholder.com/100x100",
-    },
-    {
-      title: "Plan 5",
-      expense: 2000,
-      image1: "https://via.placeholder.com/100x100",
-      image2: "https://via.placeholder.com/100x100",
-    },
-    {
-      title: "Plan 6",
-      expense: 1800,
-      image1: "https://via.placeholder.com/100x100",
-      image2: "https://via.placeholder.com/100x100",
-    },
-    {
-      title: "Plan 7",
-      expense: 1600,
-      image1: "https://via.placeholder.com/100x100",
-      image2: "https://via.placeholder.com/100x100",
-    },
-  ];
-
   const handlePrevClick = () => {
     setActiveIndex(activeIndex === 0 ? plans.length - 1 : activeIndex - 1);
   };
@@ -360,28 +316,22 @@ export default function HomePage() {
                         <Card className="rounded-4">
                           <Card.Body>
                             <Card.Title className="title">
-                              {plans[index].title}
+                              {plans[index][0]}
                             </Card.Title>
                             <h3 className="text-success">
-                              ${plans[index].expense}
+                              ${plans[index][1]}
                             </h3>
                             <div className="d-flex justify-content-center">
-                              <div className="m-auto">
+                              {plans[index][2].map((imgPath) => {
+                                return (<div className="m-auto">
                                 <img
-                                  width="100px"
-                                  height="100px"
-                                  src={plans[index].image1}
-                                  alt="Image 1"
+                                  width="75px"
+                                  height="75px"
+                                  src={imgPath}
                                 />
-                              </div>
-                              <div className="m-auto">
-                                <img
-                                  width="100px"
-                                  height="100px"
-                                  src={plans[index].image2}
-                                  alt="Image 2"
-                                />
-                              </div>
+                              </div>)
+                              })}
+                              
                             </div>
                             <div className="d-flex m-3">
                               <Button
@@ -399,28 +349,21 @@ export default function HomePage() {
                           <Card className="rounded-4">
                             <Card.Body>
                               <Card.Title className="title">
-                                {plans[index + 1].title}
+                                {plans[index + 1][0]}
                               </Card.Title>
                               <h3 className="text-success">
-                                ${plans[index + 1].expense}
+                                ${plans[index + 1][1]}
                               </h3>
                               <div className="d-flex justify-content-center">
-                                <div className="m-auto">
-                                  <img
-                                    width="100px"
-                                    height="100px"
-                                    src={plans[index + 1].image1}
-                                    alt="Image 1"
-                                  />
-                                </div>
-                                <div className="m-auto">
-                                  <img
-                                    width="100px"
-                                    height="100px"
-                                    src={plans[index + 1].image2}
-                                    alt="Image 2"
-                                  />
-                                </div>
+                              {plans[index+1][2].map((imgPath) => {
+                                return (<div className="m-auto">
+                                <img
+                                  width="75px"
+                                  height="75px"
+                                  src={imgPath}
+                                />
+                              </div>)
+                              })}
                               </div>
                               <div className="d-flex m-3">
                                 <Button

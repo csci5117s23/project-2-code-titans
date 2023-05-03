@@ -4,7 +4,7 @@ import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location }) => {
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing }) => {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
@@ -41,6 +41,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
         process().then((res) => {
           setName(res.name);
           setAmount(res.amount);
+          setDueDate(res.dueDate);
           if(res.name == "Auto" && res.carVin){
             setVinOrPrice("VIN");
             setCarInfo({year: res.carYear, make: res.carMark, model: res.carModel});
@@ -446,7 +447,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
       <Form>
         <Modal.Header style={{ backgroundColor: "#F8F4F1" }} closeButton>
           <Modal.Title>
-            <h1>Add Expense</h1>
+            <h1>{editing ? "Edit Expense" : "Add Expense"}</h1>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ backgroundColor: "#F8F4F1" }}>
@@ -542,7 +543,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location 
             variant="primary"
             type="submit"
             onClick={handleSaveChanges}>
-            Create Expense
+            {editing ? "Save Edit" : "Create Expense"}
           </Button>
         </Modal.Footer>
       </Form>

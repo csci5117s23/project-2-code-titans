@@ -18,7 +18,9 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 
 import PlannedExpensesCard from "@/components/PlannedExpensesCard";
-import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPastExpense } from "@/modules/Data";
+
+import { editPlan, getSpecificPlannedExpenses, deletePlan, getPlan, addPlannedExpense, editPlannedExpense, deletePlannedExpense } from "@/modules/Data";
+
 export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +33,7 @@ export default function NewPlanPage() {
   const [customId, setCustomId] = useState(null);
   const [createdExpenses, setCreatedExpenses] = useState([]);
   const [editedExpenses, setEditedExpenses] = useState(true);
+  const [editingBool, setEditingBool] = useState(false);
   const router = useRouter();
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
@@ -68,7 +71,7 @@ export default function NewPlanPage() {
       setCreatedExpenses(res);
       if(createdExpenses && createdExpenses.length > 0)
         console.log(id + " expenses: "+ userId + " : " + createdExpenses[0].name);
-      setCustomId(null);  
+      // setCustomId(null);  
       setEditedExpenses(false);
       setIsLoading(false);
     });
@@ -99,6 +102,14 @@ export default function NewPlanPage() {
   }, [router, isLoaded])
 
   const handleExpenseClick = (expense) => {
+    setEditingBool(false);
+    setSelectedExpense(expense);
+    setShowModal(true);
+  };
+
+  const handleExpenseEdit = (expense) => {
+    setEditingBool(true);
+    console.log("editing bools");
     setSelectedExpense(expense);
     setShowModal(true);
   };
@@ -112,6 +123,11 @@ export default function NewPlanPage() {
   const handleBackButton = () => {
     router.push("/plans");
   };
+
+  const handleExpenseDelete = async(plannedExpenseId) => {
+    const token = await getToken({ template: "codehooks" });
+    deletePlannedExpense(token,userId,plannedExpenseId).then(() => setEditedExpenses(true));
+  }
 
   const findZipCode = async (latitude, longitude) => {
     setIsLoading(true);
@@ -164,6 +180,7 @@ export default function NewPlanPage() {
         location={zipCode}
         addExpense={addPlannedExpense}
         editExpense={editPlannedExpense}
+        editing={editingBool}
       />
       <Head>
         <title>{inProgress ? "New Plan" : "Edit Plan"}</title>
@@ -302,9 +319,9 @@ export default function NewPlanPage() {
                     plannedExpense={expense}
                     onEdit={() => {
                         setCustomId(expense._id);
-                        handleExpenseClick(expense.name);
+                        handleExpenseEdit(expense.name);
                     }}
-                    onDelete={() => {}}
+                    onDelete={async () => await handleExpenseDelete(expense._id)}
                     />
                 </Col>)
               })}

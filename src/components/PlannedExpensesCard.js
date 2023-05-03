@@ -13,7 +13,7 @@ const PlannedExpenseCard = ({ plannedExpense, onEdit, onDelete }) => {
         <Card.Subtitle className="text-muted mb-3">
           Monthly Expenditure
         </Card.Subtitle>
-        <h3 style={{color: "#044303"}}>${amount.toFixed(2)}</h3>
+        <h3 style={{color: "#044303"}}>${parseFloat(amount).toFixed(2)}</h3>
         <div className="d-flex justify-content-end">
           <Button
             variant="primary"

@@ -69,9 +69,10 @@ export default function NewPlanPage() {
       const res =  await getSpecificPlannedExpenses(token, userId, id);
       console.log("res: " + res.length)
       setCreatedExpenses(res);
-      if(createdExpenses && createdExpenses.length > 0)
-        console.log(id + " expenses: "+ userId + " : " + createdExpenses[0].name);
-      // setCustomId(null);  
+      if(res && res.length > 0)
+        console.log(id + " expenses: "+ userId + " : " + res[0].name);
+      else
+        router.push('/404');
       setEditedExpenses(false);
       setIsLoading(false);
     });

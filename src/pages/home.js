@@ -151,7 +151,7 @@ export default function HomePage() {
           });
           console.log("total exp: " + totalExp);
           return {
-            totalExp: totalExp.toFixed(2),
+            totalExp: parseFloat(totalExp).toFixed(2),
             nameToSpendingData: nameToSpendingData
           };
         });

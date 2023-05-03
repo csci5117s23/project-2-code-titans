@@ -54,3 +54,8 @@ strong{
   background: "#F7E7D5";
   border-radius: "11px";
 }
+
+#sideBySide {
+  display: flex;
+  flex-direction: row;
+}

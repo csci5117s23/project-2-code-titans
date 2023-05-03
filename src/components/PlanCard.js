@@ -17,6 +17,24 @@ import {
 export default function PlanCard({name,expenditure,labels,spendingData,summaryData,activeStatus, id}) {
     Chart.register(...registerables);
     const router = useRouter();
+    const options = {
+      plugins: {
+        legend: {
+          labels: {
+            // Prevent items with undefined labels from appearing in the legend
+            filter: (item) => item.text !== undefined
+          }
+        },
+        tooltips: {
+          // Prevent items with undefined labels from showing tooltips
+          filter: (item, chart) => chart.labels[item.index] !== undefined
+        }
+        // legend: {
+        //   display: false,
+        // },
+      },
+      maintainAspectRatio: true,
+    };
     const data = {
         // labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
         labels: labels,
@@ -36,16 +54,10 @@ export default function PlanCard({name,expenditure,labels,spendingData,summaryDa
             borderWidth: 1,
           },
         ],
+        options: options
       };
     
-      const options = {
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        maintainAspectRatio: true,
-      };
+      
     
     return (
      <Card className="mb-3 rounded-5 shadow">

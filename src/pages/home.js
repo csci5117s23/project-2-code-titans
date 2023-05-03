@@ -158,7 +158,7 @@ export default function HomePage() {
                 nameToSpendingData.push(
                   "/" + entry.name.toLowerCase() + "Exp.png"
                 );
-              totalExp += entry.amount;
+              totalExp += parseFloat(entry.amount);
             });
             console.log("total exp: " + totalExp);
             return {
@@ -289,11 +289,12 @@ export default function HomePage() {
             });
           })
         : 0;
-
       for (let i = currentMonthNumeric + 1; i <= 12; i++) {
         barGraphData[i - 1] = projectedCost;
       }
+      
       setBarGraphData(barGraphData);
+      setCurrentMonthExpend(barGraphData[currentMonthNumeric - 1]);
       console.log(barGraphData);
       setBarGraphLoad(false);
     };
@@ -378,7 +379,7 @@ export default function HomePage() {
                   <h1>Monthly Expenditure</h1>
                 </div>
                 <div className="expenses d-flex ml-auto">
-                  <h1 className="text-success mr-3">$ 1 1 3 0</h1>
+                  <h1 className="text-success mr-3">$ {currentMonthExpend.toString().split('').join('\u200A'.repeat(2))}</h1>
                   <img src="/addExpenseBox.png" alt="Expenses" onClick={() => router.push("/summary/" + currentMonth)} />
                 </div>
               </div>

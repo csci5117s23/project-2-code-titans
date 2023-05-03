@@ -108,7 +108,7 @@ export default function PlansPage() {
                 nameToSpendingData.set(entry.name, entry.amount);
               }
               console.log(nameToSpendingData);
-              totalExp += entry.amount;
+              totalExp += parseFloat(entry.amount);
             });
             console.log("total exp: " + totalExp);
             setIsLoading(false);

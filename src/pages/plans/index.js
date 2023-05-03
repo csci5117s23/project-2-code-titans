@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { getAllPlans } from "@/modules/Data";
+import { deleteAllInProgressPlans, deletePlan, getAllInProgressPlans, getAllPlans } from "@/modules/Data";
 import {
   Container,
   Nav,
@@ -26,10 +26,11 @@ export default function PlansPage() {
 
   useEffect(() => {
     getToken({ template: "codehooks" }).then(async (token) => {
-      const res =  await getAllPlans(token, userId);
-      console.log("res: " + res.length)
-      if(res.length > 0)
-        setNewPlans(res);
+        deleteAllInProgressPlans(token,userId).then(async () => {
+            const res =  await getAllPlans(token, userId);
+            if(res.length > 0)
+                setNewPlans(res);
+        })
     });
   }, [router, isLoaded])
 
@@ -41,8 +42,8 @@ export default function PlansPage() {
       <Col xs={12} lg={4}>
         <PlanCard
           name={plan.name}
-          expenditure={5}
-          summaryData={"yeah and?"}
+          expenditure={`in progress: ${plan.inProgress}`}
+          summaryData={`in progress: ${plan.inProgress}`}
           id={plan._id}
           activeStatus={false}
         />
@@ -73,7 +74,7 @@ export default function PlansPage() {
               }}
               onClick={async () => {
                 const token = await getToken({ template: "codehooks" });
-                const res = await addPlan(token, {name: 'fake', userId: userId, location: '00000', isActive: false});
+                const res = await addPlan(token, {name: 'fake', userId: userId, location: '00000', isActive: false, inProgress: true});
                 router.push('/plans/' + res._id);
               }}
             >

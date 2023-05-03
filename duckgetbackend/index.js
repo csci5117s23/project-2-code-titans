@@ -12,7 +12,8 @@ const PlanYup = object({
   name: string().required(),
   userId: string().required(),
   location: string().required(),
-  isActive: boolean().required()
+  isActive: boolean().required(),
+  inProgress: boolean().optional()
 })
 
 const PlannedExpenseYup = object({
@@ -28,7 +29,7 @@ const PlannedExpenseYup = object({
   carVin: string().optional(),
   apr: number().optional(),
   term: number().optional(),
-  downPayment: number().optional()
+  downPayment: number().optional(),
 })
 
 const PastExpenseYup = object({

@@ -252,7 +252,7 @@ export default function NewPlanPage() {
             </Row>
           </div>
         </Container>
-        <div className="p-3 text-center">
+        <div className="p-3 text-center" id="sideBySide">
           <Button
             className="d-block mx-auto"
             style={{

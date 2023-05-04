@@ -4,9 +4,10 @@ import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { getStateByZip, getLoanPayables, getTotalTaxRate, getCarMake, getCarPaidInFull, getValuableCarInfo, getCarPrice, getAvgHomeInsuranceCost } from '@/modules/utilsCost';
+import { data } from "jquery";
 
 
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense  }) => {
+const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense, past  }) => {
 
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
@@ -69,8 +70,9 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
   const handleSaveChanges = async (e) => {
     // Do something with the expense data
     e.preventDefault();
-    if(name.trim()==="" || amount===null || amount===undefined || dueDate==="" || !amount) return;
-    const token = await getToken({ template: "codehooks" })
+    console.log(past);
+    if(!past && (name.trim()==="" || amount===null || amount===undefined || dueDate==="" || !amount)) return;
+    
     let savedChanges = {
       name: name,
       userId: userId,
@@ -78,6 +80,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
       planId: planId,
       dueDate: dueDate,
     };
+    if(past) savedChanges['date'] = planId;
     if(carInfo){
       savedChanges['carModel'] = carInfo.model;
       savedChanges['carMake'] = carInfo.make;
@@ -92,6 +95,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
     if(downpayment)
       savedChanges['downpayment'] = downpayment;
     if(editing && expenseId){
+      const token = await getToken({ template: "codehooks" })
       console.log('expenseId: ' + expenseId);
       console.log(savedChanges);
       await editExpense(token, userId, expenseId, savedChanges).then(() => {
@@ -99,8 +103,13 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
       });
       
     }else{
-      await addExpense(token, savedChanges);
-      handleClose();
+      const token = await getToken({ template: "codehooks" })
+      console.log("saved changes");
+      console.log(savedChanges)
+      await addExpense(token, savedChanges).then((res) => {
+        console.log(res);
+        handleClose();
+      }); 
     }
   };
 

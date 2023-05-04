@@ -53,8 +53,6 @@ export default function NewPlanPage() {
       setCreatedExpenses(res);
       if(res && res.length > 0)
         console.log(date + " expenses: "+ userId + " : " + res[0].name);
-      else
-        router.push('/404');
 
       setPlanName(date);
       setZipCode("");
@@ -126,6 +124,18 @@ export default function NewPlanPage() {
     }
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    const checkValidity = async () => {
+      const token = await getToken({ template: "codehooks" })
+      return (await getPastExpensesByDate(token,userId,date)).length > 0;
+    }
+    if(isLoaded && userId){
+      checkValidity().then((res) => {
+        if(!res) router.push('/404');
+      });
+    }
+  }, [isLoaded, router])
   
   return  (
     <>
@@ -145,6 +155,7 @@ export default function NewPlanPage() {
         editExpense={editPastExpense}
         getSingleExpense={getSinglePastExpense}
         editing={editingBool}
+        past={true}
       />
       <Head>
         <title>{date + " Summary"}</title>

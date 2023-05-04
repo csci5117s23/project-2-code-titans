@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -219,14 +219,6 @@ export default function HomePage() {
       )+"-"+currentYear);
       for (let i = 1; i <= currentMonthNumeric; i++) {
         const token = await getToken({ template: "codehooks" });
-        console.log(
-          i.toLocaleString("en-US", {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          }) +
-            "-" +
-            currentYear
-        );
         let ithMonth = await getPastExpensesByDate(
           token,
           userId,
@@ -250,25 +242,33 @@ export default function HomePage() {
               userId,
               activePlan._id
             ).then(async (res) => {
-              const pastExpenses = await Promise.all(
+              return Promise.all(
                 res.map(async (expense) => {
                   const expenseToken = await getToken({ template: "codehooks" });
                   const expenseData = {
                     name: expense.name,
                     userId: userId,
                     amount: expense.amount,
-                    date: currentMonth,
+                    date: (i).toLocaleString(
+                      "en-US",
+                      { minimumIntegerDigits: 2, useGrouping: false }
+                    )+"-"+currentYear
                   };
                   const pastExpense = await addPastExpense(expenseToken, expenseData);
                   console.log("expense Data: ")
                   console.log(expenseData);
                   console.log("pastExpense: ");
-                  console.log(pastExpense)
+                  console.log(pastExpense);
+                  return pastExpense;
                 })
-              )
-              return pastExpenses.reduce((acc, ith) => {
-                return acc + parseFloat(ith.amount);
-              }, 0);
+              ).then((pastExpenses) => {
+                console.log("past Expenses: ");
+                console.log(pastExpenses);
+                return pastExpenses.reduce((acc, ith) => {
+                  return acc + parseFloat(ith.amount);
+                }, 0);
+              })
+              
             });
             console.log("data " + (i - 1) + " :" + barGraphData[i - 1]);
           }
@@ -309,8 +309,9 @@ export default function HomePage() {
       console.log(barGraphData);
       setBarGraphLoad(false);
     };
-    checkPastMonths();
-  }, [barGraphLoad]);
+    if(isLoaded && userId)
+      checkPastMonths();
+  }, [barGraphLoad, isLoaded, userId]);
 
   useEffect(() => {
     let tempInfo = barInfo;

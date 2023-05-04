@@ -237,6 +237,9 @@ export default function HomePage() {
             "-" +
             currentYear
         );
+        console.log("ithMonth: ");
+        console.log(ithMonth);
+
         if (!ithMonth || ithMonth.length == 0) {
           const activePlan = (await getAllActivePlans(token, userId))[0];
           if (activePlan){

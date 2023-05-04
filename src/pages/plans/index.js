@@ -8,6 +8,7 @@ import {
   getSpecificPlannedExpenses,
   getSinglePlannedExpense,
   activatePlan,
+  deletePlan,
 } from "@/modules/Data";
 import {
   Container,
@@ -141,7 +142,11 @@ export default function PlansPage() {
               console.log("we made it here with totalExp: " + totalExp);
               const planNames = Array.from(nameToSpendingData.keys());
               const spendingData = Array.from(nameToSpendingData.values());
-              return (
+              if(plan.inProgress) {
+                await deletePlan(token, userId, plan._id);
+                return <></>
+              }
+              else return (
                 <Col xs={12} lg={4}>
                   <PlanCard
                     name={plan.name}

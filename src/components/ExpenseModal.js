@@ -66,8 +66,9 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
     setZipCode(location);
   }, [location])
 
-  const handleSaveChanges = async () => {
+  const handleSaveChanges = async (e) => {
     // Do something with the expense data
+    e.preventDefault();
     if(name.trim()==="" || amount===null || amount===undefined || dueDate==="" || !amount) return;
     const token = await getToken({ template: "codehooks" })
     let savedChanges = {

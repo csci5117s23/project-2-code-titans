@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { useAuth, useUser } from "@clerk/nextjs";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -85,7 +85,6 @@ export default function NewPlanPage() {
         async function process() {
             if(id) {
                 const res = (await getPlan(token,userId,id))[0];
-                if(!res || res.length == 0) router.push('/404')
                 console.log("id: " + id);
                 return res;
             }
@@ -165,10 +164,21 @@ export default function NewPlanPage() {
     }
     setIsLoading(false);
   };
+  useEffect(() => {
+    const checkValidity = async () => {
+      const token = await getToken({ template: "codehooks" })
+      return (await getPlan(token,userId,id)).length > 0;
+    }
+    if(isLoaded && userId){
+      checkValidity().then((res) => {
+        if(!res) router.push('/404');
+      });
+    }
+  }, [isLoaded, router])
   
   return  (
     <>
-    {isLoading && (
+    {(isLoading || !isLoaded || !userId) && (
           <div className="loader-container">
             <Loader />
           </div>

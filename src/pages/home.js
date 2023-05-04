@@ -252,18 +252,18 @@ export default function HomePage() {
             ).then(async (res) => {
               const pastExpenses = await Promise.all(
                 res.map(async (expense) => {
-                  return await addPastExpense(token, {
+                  const expenseToken = await getToken({ template: "codehooks" });
+                  const expenseData = {
                     name: expense.name,
                     userId: userId,
                     amount: expense.amount,
-                    date:
-                      i.toLocaleString("en-US", {
-                        minimumIntegerDigits: 2,
-                        useGrouping: false,
-                      }) +
-                      "-" +
-                      currentYear,
-                  });
+                    date: currentMonth,
+                  };
+                  const pastExpense = await addPastExpense(expenseToken, expenseData);
+                  console.log("expense Data: ")
+                  console.log(expenseData);
+                  console.log("pastExpense: ");
+                  console.log(pastExpense)
                 })
               )
               return pastExpenses.reduce((acc, ith) => {

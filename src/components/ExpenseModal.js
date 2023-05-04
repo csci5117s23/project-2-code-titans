@@ -3,6 +3,7 @@ import { Modal, Button, Container, Row, Col, Form } from "react-bootstrap";
 import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice, getSinglePlannedExpense } from "@/modules/Data";
 import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { getStateByZip, getLoanPayables, getTotalTaxRate, getCarMake, getCarPaidInFull, getValuableCarInfo, getCarPrice, getAvgHomeInsuranceCost } from '@/modules/utilsCost';
 
 
 const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense  }) => {
@@ -19,7 +20,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
   const [vin, setVin] = useState(null);
   const [financeOrFull, setFinanceOrFull] = useState("Finance");
   const [downpayment, setDownpayment] = useState(null);
-   const [APR, setAPR] = useState(null);
+  const [APR, setAPR] = useState(null);
   const [term, setTerm] = useState(null);
   const [dueDate, setDueDate] = useState(new Date());
   const [carInfo, setCarInfo] = useState(null);
@@ -33,7 +34,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
     setIsDisabled(name === "Auto" || name === "Home");
   }, [expense]);
 
-  useEffect( () => {
+  useEffect(() => {
     if(expenseId && expenseId.length > 0){
       console.log("expenseId: " + expenseId);
       getToken({ template: "codehooks" }).then(async (token) => {
@@ -114,35 +115,54 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
 
   const handleLookup = async () => {
     const token = await getToken({ template: "codehooks" });
-    const res = await getCarInfo(token, vin);
-    setCustomAutoPrice(res.price);
-    setCarInfo(res);
+    // const res = await getCarInfo(token, vin);
+    getValuableCarInfo(vin).then((res) => {
+      console.log(res);
+      setCustomAutoPrice(res.price);
+      setCarInfo(res);
+    });
+    // console.log("getValuableCarInfo reached");
+    
   };
 
   const handleComputeCarAPR = async () => {
     console.log("Clicked!");
-    const token = await getToken({ template: "codehooks" });
-    const res = await getCarLoanPayments(token, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice) - downpayment, APR, term);
-    setAmount(parseFloat(res));
+    // const token = await getToken({ template: "codehooks" });
+    // const res = await getCarLoanPayments(token, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice) - downpayment, APR, term);
+    
+    getLoanPayables((vinOrPrice == "VIN" ? carInfo.price : customAutoPrice) - downpayment,APR,term,0,0).then((res) => setAmount(parseFloat(res)));
+    // setAmount(parseFloat(res));
   };
 
 
   const handleFullPaymentCar = async() => {
-    const token = await getToken({ template: "codehooks" });
-    const res = await buyCarInFull(token, zipCode, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice));
-    setAmount (parseFloat(res));
+    // const token = await getToken({ template: "codehooks" });
+    // const res = await buyCarInFull(token, zipCode, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice));
+    getTotalTaxRate(zipCode).then((tax) => setAmount(getCarPaidInFull(customAutoPrice,tax)));
+    // setAmount (parseFloat(res));
   };
 
   const handleOwnHomeCosts = async() => {
-    const token = await getToken({ template: "codehooks" });
-    const res = await getHomePrice(token, zipCode, homePrice - downpayment, APR, term);
-    setAmount(parseFloat(res));
+    // const token = await getToken({ template: "codehooks" });
+    // const res = await getHomePrice(token, zipCode, homePrice - downpayment, APR, term);
+    const state = await getStateByZip(zipCode);
+    getAvgHomeInsuranceCost(state).then((insurance) => {console.log(insurance);
+    getLoanPayables(homePrice,APR,term,parseFloat(insurance[0]) * homePrice,parseFloat(insurance[1]) * homePrice).then((res) => 
+    setAmount(parseFloat(res).toFixed(2)))});
+    // const loan = await getLoanPayables(amount,APR,term,insurance[0] * amount,insurance[1] * amount)
+    // setAmount(parseFloat(loan));
   };
 
   const handleRentCosts = async() => {
-    const token = await getToken({ template: "codehooks" });
-    const res = await getAptPrice(token, zipCode, rent);
-    setAmount(parseFloat(res));
+    // const token = await getToken({ template: "codehooks" });
+    // const res = await getAptPrice(token, zipCode, rent);
+    console.log(await getStateByZip(zipCode));
+    const state = await getStateByZip(zipCode);
+    console.log(rent);
+    getAvgHomeInsuranceCost(state).then((insurance) => {console.log(insurance[2]);
+    getLoanPayables(rent * 12,0.1,1,parseFloat(insurance[2]),0).then((res) => 
+    setAmount(parseFloat(res).toFixed(2)))});
+    // setAmount(parseFloat(res));
   };
   
   const renderAutoFields = () => {

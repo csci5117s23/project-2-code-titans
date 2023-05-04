@@ -28,101 +28,39 @@ export default function CostCalculator(){
 
     // useEffect(() => {}, [isLoaded,state]);
 
-    async function getValues(principal,intRate,loanDuration,avgHomeInsurance,propertyTax){
-        console.log("getValues function reached");
-        getLoanPayables(principal,intRate,loanDuration,avgHomeInsurance,propertyTax).then((res) => setLoanAmt(res));
-        return loanAmt;
-    }
     
-    async function getZipTax(){
-        console.log("getZipTax function reached");
-        // setLoanAmt(calcCost.getLoanPayables(200000,3.5,30));
-        setTaxRate(await getTotalTaxRate(55414));
-        return taxRate;
-    }
 
-    // Yennodu VIN L5YZCABP1N1146187
-    async function getCarManufacturer(VIN){
-        console.log("getCarManufacturer function reached");
-        setCarVIN(VIN);
-        setCarMake(await getCarMake(VIN));
-        setCarYear(await getCarYear(VIN));
-        setCarModel(await getCarModel(VIN));
-        return carMake;
-    }
-
-    async function getStateOfZipCode(zip){
-        console.log("getStateOfZipcode function reached");
-        console.log("Zipcode: " + zip);
-        getStateByZip(zip).then((derState) => {
-            getAvgHomeInsuranceCost(derState).then((res) => {
-                setAvgHomeInsuranceCost(res[0]);
-                setCurPropertyTax(res[1]);
-                setAvgRentersInsurance(res[2]);
-                setState(derState);
-            });
-        })
-        // const res = (await getAvgHomeInsuranceCost(state)).then((data) => {setAvgHomeInsuranceCost(data[0]); setCurPropertyTax(data[1]);});
-        // setAvgHomeInsuranceCost(res[0]);
-        // setCurPropertyTax(res[1]);
-        
-        return state;
-    }
-
-    async function getCarPriceEstimate(carMake,carYear,carModel){
-        console.log("getCarPriceEstimate function reached");
-        setCarPrice(await getCarPrice(carMake,carYear,carModel));
-        return carPrice;
-    }
-
-    return (
-        <>
-            <h3>Enter your zipcode to find the state</h3>
-            <textarea placeholder="Enter 5 digit zipcode" onChange={(e) => setZipcode(e.target.value)}></textarea>
-            <button onClick={async () => getStateOfZipCode(zipcode)}>{state}</button>
-            <h3>House Loan amount payable per month:</h3><br></br>
-            <textarea placeholder="Enter your house loan amount" onChange={(e) => setPrincipal(e.target.value)}></textarea>
-            <textarea placeholder="Enter the (%) interest rate on your loan" onChange={(e) => setIntRate(e.target.value)}></textarea>
-            <textarea placeholder="Enter the duration of the loan period" onChange={(e) => setLoanDuration(e.target.value)}></textarea>
-            <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost * principal,curPropertyTax * principal)}>{loanAmt}</button>
-            <h3>Rent amount payable per month:</h3>
-            <textarea placeholder="Enter monthly rent payment" onChange={(e) => setRentAmount(e.target.value)}></textarea>
-            <button onClick={async () => getValues(rentAmount * 12,0.1,1,avgRentersInsurance,0)}>{loanAmt}</button>
-            <h3>Total tax Rate for your zip code:</h3>
-            <button onClick={getZipTax}>{taxRate}</button>
-            <h3>Get Car Make:</h3>
-            <textarea placeholder="Enter your VIN" onChange={(e) => getCarManufacturer(e.target.value)}></textarea>
-            <h5>{carMake}</h5>
-            <h3>Get Car Price:</h3>
-            <button onClick={async () => {getCarPriceEstimate(carMake,carYear,carModel)}}>{carPrice}</button>
-        </>
-    );
+    // return (
+    //     <>
+    //         <h3>Enter your zipcode to find the state</h3>
+    //         <textarea placeholder="Enter 5 digit zipcode" onChange={(e) => setZipcode(e.target.value)}></textarea>
+    //         <button onClick={async () => getStateOfZipCode(zipcode)}>{state}</button>
+    //         <h3>House Loan amount payable per month:</h3><br></br>
+    //         <textarea placeholder="Enter your house loan amount" onChange={(e) => setPrincipal(e.target.value)}></textarea>
+    //         <textarea placeholder="Enter the (%) interest rate on your loan" onChange={(e) => setIntRate(e.target.value)}></textarea>
+    //         <textarea placeholder="Enter the duration of the loan period" onChange={(e) => setLoanDuration(e.target.value)}></textarea>
+    //         <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost * principal,curPropertyTax * principal)}>{loanAmt}</button>
+    //         <h3>Rent amount payable per month:</h3>
+    //         <textarea placeholder="Enter monthly rent payment" onChange={(e) => setRentAmount(e.target.value)}></textarea>
+    //         <button onClick={async () => getValues(rentAmount * 12,0.1,1,avgRentersInsurance,0)}>{loanAmt}</button>
+    //         <h3>Total tax Rate for your zip code:</h3>
+    //         <button onClick={getZipTax}>{taxRate}</button>
+    //         <h3>Get Car Make:</h3>
+    //         <textarea placeholder="Enter your VIN" onChange={(e) => getCarManufacturer(e.target.value)}></textarea>
+    //         <h5>{carMake}</h5>
+    //         <h3>Get Car Price:</h3>
+    //         <button onClick={async () => {getCarPriceEstimate(carMake,carYear,carModel)}}>{carPrice}</button>
+    //     </>
+    // );
 }
 
-async function getStateByZip(zip){
-    const api_url = `https://api.api-ninjas.com/v1/zipcode?zip=${zip}`;
-    const response = await fetch(api_url, {headers: {
-        "X-Api-Key": apiNinjaKey
-      }}).then(response => response.json()).then(data => { console.log(data[0].state); return data[0].state;}).catch(error => console.error(error));
-    return response;
-}
+    
 
-async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
-    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
-    const response = await fetch(api_url, {headers: {
-        "X-Api-Key": apiNinjaKey
-      }}).then(response => response.json()).then(data => {return data.monthly_payment.total;}).catch(error => console.error(error));
-    return response;
-}
-
-// This is to get the total tax rate (including any additional, city, county and state taxes)
-async function getTotalTaxRate(zip){
-    const api_url = `https://api.api-ninjas.com/v1/salestax?zip_code=${zip}`;
-    const response = await fetch(api_url, {headers: {
-        "X-Api-Key": apiNinjaKey
-      }}).then(response => response.json()).then(data => {console.log("Data[0].total_rate: "); console.log(data[0].total_rate); return data[0].total_rate;}).catch(error => console.error(error));
-    return response;
-}
+    // async function getCarModel(VIN){
+    //     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+    //     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
+    //     return response;
+    // }
 
 // This is to get the city tax rate
 // async function getCityTaxRate(zip){
@@ -133,23 +71,132 @@ async function getTotalTaxRate(zip){
 //     return response;
 // }
 
-//Getting the manufacturer/make of the car (i.e. Acura, Buick etc.)
-async function getCarMake(VIN){
-    const api_url = `https://api.api-ninjas.com/v1/vinlookup?vin=${VIN}`;
+
+
+//Getting the year the car was made (i.e. 2015, 2022 etc.)
+
+
+
+
+// async function getCarModel(VIN){
+//     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+//     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
+//     return response;
+// }
+// 
+// async function buyCarInFull(price,tax){
+//     const response = getTotalTaxRate(req.query.zip).then((tax) => {return getCarPaidInFull(req.query.price,tax)});
+//     res.send((await response).toString());
+// }
+
+export async function getValues(principal,intRate,loanDuration,avgHomeInsurance,propertyTax){
+    console.log("getValues function reached");
+    getLoanPayables(principal,intRate,loanDuration,avgHomeInsurance,propertyTax).then((res) => setLoanAmt(res));
+    return loanAmt;
+}
+
+export async function getZipTax(){
+    console.log("getZipTax function reached");
+    // setLoanAmt(calcCost.getLoanPayables(200000,3.5,30));
+    setTaxRate(await getTotalTaxRate(55414));
+    return taxRate;
+}
+
+// Yennodu VIN L5YZCABP1N1146187
+export async function getCarManufacturer(VIN){
+    console.log("getCarManufacturer function reached");
+    setCarVIN(VIN);
+    setCarMake(await getCarMake(VIN));
+    setCarYear(await getCarYear(VIN));
+    setCarModel(await getCarModel(VIN));
+    return carMake;
+}
+
+export async function getStateOfZipCode(zip){
+    console.log("getStateOfZipcode function reached");
+    console.log("Zipcode: " + zip);
+    getStateByZip(zip).then((derState) => {
+        getAvgHomeInsuranceCost(derState).then((res) => {
+            setAvgHomeInsuranceCost(res[0]);
+            setCurPropertyTax(res[1]);
+            setAvgRentersInsurance(res[2]);
+            setState(derState);
+        });
+    })
+    // const res = (await getAvgHomeInsuranceCost(state)).then((data) => {setAvgHomeInsuranceCost(data[0]); setCurPropertyTax(data[1]);});
+    // setAvgHomeInsuranceCost(res[0]);
+    // setCurPropertyTax(res[1]);
+    
+    return state;
+}
+
+export async function getCarPriceEstimate(carMake,carYear,carModel){
+    console.log("getCarPriceEstimate function reached");
+    setCarPrice(await getCarPrice(carMake,carYear,carModel));
+    return carPrice;
+}
+
+export async function getValuableCarInfo(VIN){
+    const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
+    const info1 = await fetch(api_url).then(response => response.json()).then((data) => {
+      return [data.Results[7].Value.charAt(0) + data.Results[7].Value.slice(1).toLowerCase(),data.Results[9].Value,data.Results[10].Value];
+    }).catch(error => console.error(error));
+    // const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data"); console.log(data.Results[9].Value); return [data.Results[7].Value,data.Results[9].Value,data.Results[10].Value];}).catch(error => console.error(error));
+    const price = await getCarPrice(info1[0],info1[2],info1[1]);
+    const info = {
+      'make': info1[0],
+      'model': info1[1],
+      'year': info1[2],
+      'price': price
+    };
+    return info;
+}
+
+export async function getStateByZip(zip){
+    const api_url = `https://api.api-ninjas.com/v1/zipcode?zip=${zip}`;
     const response = await fetch(api_url, {headers: {
         "X-Api-Key": apiNinjaKey
-      }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: "); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
+    }}).then(response => response.json()).then(data => { console.log(data[0].state); return data[0].state;}).catch(error => console.error(error));
     return response;
 }
 
-//Getting the year the car was made (i.e. 2015, 2022 etc.)
-async function getCarYear(VIN){
+export async function getLoanPayables(amt,interestRate,duration,avgHomeInsurance,propertyTax){
+    const api_url = `https://api.api-ninjas.com/v1/mortgagecalculator?loan_amount=${amt}&interest_rate=${interestRate}&duration_years=${duration}&annual_home_insurance=${avgHomeInsurance}&annual_property_tax=${propertyTax}`;
+    const response = await fetch(api_url, {headers: {
+        "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {return (data.monthly_payment.total).toFixed(2);}).catch(error => console.error(error));
+    return response;
+}
+
+export async function getTotalTaxRate(zip){
+    const api_url = `https://api.api-ninjas.com/v1/salestax?zip_code=${zip}`;
+    const response = await fetch(api_url, {headers: {
+        "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {console.log("Data[0].total_rate: "); console.log(data[0].total_rate); return data[0].total_rate;}).catch(error => console.error(error));
+    return response;
+}
+
+//Getting the manufacturer/make of the car (i.e. Acura, Buick etc.)
+export async function getCarMake(VIN){
+    const api_url = `https://api.api-ninjas.com/v1/vinlookup?vin=${VIN}`;
+    const response = await fetch(api_url, {headers: {
+        "X-Api-Key": apiNinjaKey
+    }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: "); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
+    return response;
+}
+
+export async function getCarYear(VIN){
     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[10].Value"); console.log(data.Results[10].Value); return data.Results[10].Value;}).catch(error => console.error(error));
     return response;
 }
 
-async function getCarPrice(carMake,carYear,carModel){
+export function getCarPaidInFull(price,tax){
+    console.log("price: " + price + " tax: " + tax);
+    return (parseFloat(price) * (1 + parseFloat(tax))).toFixed(2);
+}
+
+export async function getCarPrice(carMake,carYear,carModel){
     console.log("CarYear: " + carYear);
     const response = await fetch("/cars.txt");
     const data = await response.text();
@@ -169,8 +216,6 @@ async function getCarPrice(carMake,carYear,carModel){
     console.log("Type of carYear: " + typeof(carYear));
     console.log("All " + carYear + " " + carMake + " " + carModel + " prices total to: " + carPriceSum);
     console.log("Total number of cars: " + numCars);
-    // let sampleModel = "TL4dr";
-    // console.log("Sample model (TL4dr) includes TL?: " + sampleModel.includes("TL"));
     
     avgPrice = carPriceSum / numCars;
     
@@ -179,13 +224,7 @@ async function getCarPrice(carMake,carYear,carModel){
     return avgPrice;
 }
 
-async function getCarModel(VIN){
-    const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
-    const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
-    return response;
-}
-
-async function getAvgHomeInsuranceCost(state){
+export async function getAvgHomeInsuranceCost(state){
     const response = await fetch("/avgHomeInsuranceCosts.txt");
     const data = await response.text();
     const lines = data.split("\n");

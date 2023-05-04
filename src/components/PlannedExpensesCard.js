@@ -18,11 +18,26 @@ const PlannedExpenseCard = ({ plannedExpense, onEdit, onDelete }) => {
           <Button
             variant="primary"
             onClick={onEdit}
-            style={{ marginRight: "1rem" }}
+            style={{
+              marginRight: "1rem",
+              backgroundColor: "#47B1ED",
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              width: "fit-content",
+              border: "none"
+            }}
           >
             Edit
           </Button>
-          <Button variant="danger" onClick={onDelete}>
+          <Button
+            variant="danger"
+            style={{
+              backgroundColor: "#FF1D18",
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              width: "fit-content",
+              border: "none"
+            }}
+            onClick={onDelete}
+          >
             Delete
           </Button>
         </div>

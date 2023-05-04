@@ -29,6 +29,7 @@ import {
 } from "@/modules/Data";
 import { useRef } from "react";
 import Chartjs from "chart.js";
+import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -142,7 +143,9 @@ export default function HomePage() {
       maintainAspectRatio: false,
     },
   });
-  const [barInstance, setBarInstance] = useState(null);
+  const [summaryLabels,setSummaryLabels] = useState([]);
+  const [summaryData,setSummaryData] = useState([]);
+  const [missingSummaryData,setMissingSummaryData] = useState(true);
 
   useEffect(() => {
     const getTotalExp = async (plan) => {
@@ -347,6 +350,26 @@ export default function HomePage() {
     },
     maintainAspectRatio: false,
   };
+
+  useEffect(() => {
+    getToken({ template: "codehooks" }).then(async (token) => {
+      async function process() {
+        if(userId) {
+          const res = await getPastExpensesByDate(token,userId,currentMonth);
+          return res;
+        }
+        return [];
+      }
+      
+      process().then((res) => {
+        console.log("Checking somethign: " + res);
+        const currLabels = getUniqueNames(res)
+        setSummaryLabels(currLabels);
+        setSummaryLabels(getSummaryData(currLabels,res));
+      })
+    })
+  },[isLoaded])
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handlePrevClick = () => {
@@ -413,7 +436,30 @@ export default function HomePage() {
                 )} ${new Date().getFullYear()}`}</h6>
               </div>
               <div className="my-5 mx-auto" style={{ maxWidth: "500px" }}>
-                <Doughnut data={donutdata} options={donutoptions} />
+                {missingSummaryData ? (
+                  <h3>Missing Summary Data...</h3>
+                ) : (
+                  <Doughnut
+                    data={{
+                      labels: summaryLabels,
+                      datasets: [
+                        {
+                          label: "Spending Summary",
+                          data: summaryData,
+                          backgroundColor: [
+                            "#FF6384",
+                            "#36A2EB",
+                            "#FFCE56",
+                            "#FF8A80",
+                            "#B2FF59",
+                            "#D7CCC8",
+                          ],
+                          borderWidth: 1,
+                        },
+                      ],
+                    }}
+                    options={donutoptions} />
+                )}
               </div>
             </Card.Body>
           </Card>
@@ -425,6 +471,7 @@ export default function HomePage() {
             onSelect={(selectedIndex) => setActiveIndex(selectedIndex)}
             interval={null}
             slide={2} // Set number of cards displayed to 2
+            controls={false}
           >
             {plans.reduce((acc, plan, index) => {
               if (index % 2 === 0) {

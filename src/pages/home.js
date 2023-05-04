@@ -285,17 +285,19 @@ export default function HomePage() {
       console.log(activePlan);
 
       const projectedCost = activePlan
-        ? await getToken({ template: "codehooks" }).then(async (token) => {
+        ? (await getToken({ template: "codehooks" }).then(async (token) => {
             return await getSpecificPlannedExpenses(
               token,
               userId,
               activePlan._id
             ).then((res) => {
+              console.log("the res that errors: ");
+              console.log(res);
               return res.reduce((acc, entry) => {
                 return acc + parseFloat(entry.amount);
               }, 0);
             });
-          })
+          }))
         : 0;
       for (let i = currentMonthNumeric + 1; i <= 12; i++) {
         barGraphData[i - 1] = projectedCost;

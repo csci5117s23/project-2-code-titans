@@ -274,6 +274,7 @@ export default function HomePage() {
             return acc + parseFloat(ith.amount);
           }, 0);
         }
+        setBarGraphData(barGraphData);
 
       }
       const token = await getToken({ template: "codehooks" });

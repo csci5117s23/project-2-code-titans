@@ -37,7 +37,7 @@ const PastExpenseYup = object({
   name: string().required(),
   userId: string().required(),
   amount: number().required().positive(),
-  date: date().required().max(new Date())
+  date: string().required()
 })
 
 // const { Storage } = require('@google-cloud/storage');

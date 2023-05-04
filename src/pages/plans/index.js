@@ -7,6 +7,7 @@ import {
   getAllPlannedExpenses,
   getSpecificPlannedExpenses,
   getSinglePlannedExpense,
+  activatePlan,
 } from "@/modules/Data";
 import {
   Container,
@@ -32,6 +33,7 @@ export default function PlansPage() {
   const [totalExpenditure, setTotalExpenditure] = useState(0);
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const [ isLoading, setIsLoading ] = useState(true);
+  const [ activation, setActivation ] = useState(false);
   const router = useRouter();
 
   // useEffect(() => {
@@ -106,18 +108,27 @@ export default function PlansPage() {
                 nameToSpendingData.set(entry.name, entry.amount);
               }
               console.log(nameToSpendingData);
-              totalExp += entry.amount;
+              totalExp += parseFloat(entry.amount);
             });
             console.log("total exp: " + totalExp);
             setIsLoading(false);
             return {
-              totalExp: totalExp.toFixed(2),
+              totalExp: parseFloat(totalExp).toFixed(2),
               nameToSpendingData: nameToSpendingData,
             };
           }
         );
       });
     };
+
+    const activate = async (id) => {
+      setActivation(true);
+      setIsLoading(true);
+      const token = await getToken({ template: "codehooks" });
+      await activatePlan(token, userId, id);
+      setActivation(false);
+      setIsLoading(false);
+    }
 
     getToken({ template: "codehooks" }).then(async (token) => {
       const res = await getAllPlans(token, userId);
@@ -139,7 +150,8 @@ export default function PlansPage() {
                     spendingData={spendingData}
                     summaryData={"yeah and?"}
                     id={plan._id}
-                    activeStatus={false}
+                    activeStatus={plan.isActive}
+                    activate={activate}
                   />
                 </Col>
               );
@@ -149,7 +161,7 @@ export default function PlansPage() {
       }
       setIsLoading(false);
     });
-  }, [router, isLoaded]);
+  }, [router, isLoaded, activation]);
 
   if (!isLoaded)
     return (

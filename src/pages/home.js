@@ -446,7 +446,7 @@ export default function HomePage() {
                                 variant="primary"
                                 className="m-auto main-button p-2"
                                 onClick={() => {
-                                  router.push("/plans/" + plans[index + 1][3]);
+                                  router.push("/plans/" + plans[index][3]);
                                 }}
                               >
                                 View

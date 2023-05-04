@@ -25,9 +25,9 @@ export default function NewPlanPage() {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedExpense, setSelectedExpense] = useState("");
-  const [planName, setPlanName] = useState("");
+  const [planName, setPlanName] = useState(null);
   const [projectedYearlyIncome, setProjectedYearlyIncome] = useState("");
-  const [zipCode, setZipCode] = useState("");
+  const [zipCode, setZipCode] = useState(null);
   const [active, setActive] = useState(false);
   const [inProgress, setInProgress] = useState(false);
   const [customId, setCustomId] = useState(null);
@@ -91,9 +91,9 @@ export default function NewPlanPage() {
             }
         }
         process().then((res) => {
-            setPlanName(res.inProgress ? "" : res.name);
-            setZipCode(res.inProgress ? "" : res.location);
-            setProjectedYearlyIncome(res.inProgress ? "" : res.projectedIncome);
+            setPlanName(res.inProgress ? null : res.name);
+            setZipCode(res.inProgress ? null : res.location);
+            setProjectedYearlyIncome(res.inProgress ? null : res.projectedIncome);
             setActive(res.isActive);
             setInProgress(res.inProgress);
         }).catch(() => {
@@ -344,7 +344,7 @@ export default function NewPlanPage() {
                 border: "none",
                 marginBottom: "30px",
             }}
-            onClick={updateChanges}
+            onClick={() => {if(planName != null && zipCode != null) updateChanges()}}
             >
             <h1>Save</h1>
           </Button>

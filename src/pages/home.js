@@ -239,7 +239,9 @@ export default function HomePage() {
         );
         if (!ithMonth || ithMonth.length == 0) {
           const activePlan = (await getAllActivePlans(token, userId))[0];
-          if (activePlan)
+          if (activePlan){
+            console.log("active plan: ");
+            console.log(activePlan);
             barGraphData[i - 1] = await getSpecificPlannedExpenses(
               token,
               userId,
@@ -264,6 +266,8 @@ export default function HomePage() {
             }).reduce((acc, ith) => {
               return acc + parseFloat(ith.amount);
             }, 0);
+            console.log("data " + (i - 1) + " :" + barGraphData[i - 1]);
+          }
           else barGraphData[i - 1] = 0;
         }else{
           barGraphData[i - 1] = ithMonth.reduce((acc, ith) => {

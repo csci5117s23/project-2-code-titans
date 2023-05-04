@@ -66,15 +66,15 @@ export default function NewPlanPage() {
   useEffect(() => {
     setIsLoading(true);
     getToken({ template: "codehooks" }).then(async (token) => {
-      const res =  await getSpecificPlannedExpenses(token, userId, id);
-      console.log("res: " + res.length)
-      setCreatedExpenses(res);
-      if(res && res.length > 0)
-        console.log(id + " expenses: "+ userId + " : " + res[0].name);
-      else
-        router.push('/404');
-      setEditedExpenses(false);
-      setIsLoading(false);
+      getSpecificPlannedExpenses(token, userId, id).then((res) => {
+        console.log("res: " + res)
+        setCreatedExpenses(res);
+        if(res && res.length > 0)
+          console.log(id + " expenses: "+ userId + " : " + res[0].name);
+        setEditedExpenses(false);
+        setIsLoading(false);
+      });
+      
     });
     
   }, [showModal, router, isLoaded, editedExpenses])
@@ -85,6 +85,7 @@ export default function NewPlanPage() {
         async function process() {
             if(id) {
                 const res = (await getPlan(token,userId,id))[0];
+                if(!res || res.length == 0) router.push('/404')
                 console.log("id: " + id);
                 return res;
             }

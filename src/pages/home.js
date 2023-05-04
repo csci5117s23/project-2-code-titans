@@ -250,7 +250,7 @@ export default function HomePage() {
               userId,
               activePlan._id
             ).then(async (res) => {
-              return await Promise.all(
+              const pastExpenses = await Promise.all(
                 res.map(async (expense) => {
                   return await addPastExpense(token, {
                     name: expense.name,
@@ -265,10 +265,11 @@ export default function HomePage() {
                       currentYear,
                   });
                 })
-              );
-            }).reduce((acc, ith) => {
-              return acc + parseFloat(ith.amount);
-            }, 0);
+              )
+              return pastExpenses.reduce((acc, ith) => {
+                return acc + parseFloat(ith.amount);
+              }, 0);
+            });
             console.log("data " + (i - 1) + " :" + barGraphData[i - 1]);
           }
           else barGraphData[i - 1] = 0;

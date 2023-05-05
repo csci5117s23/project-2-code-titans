@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAuth, useUser } from "@clerk/nextjs";
-// const {Storage} = require('@google-cloud/storage');
+import { useAuth } from "@clerk/nextjs";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   getAllPlans,
-  getAllPlannedExpenses,
   getSpecificPlannedExpenses,
-  getSinglePlannedExpense,
   activatePlan,
   deletePlan,
 } from "@/modules/Data";
-import {
-  Container,
-  Nav,
-  Navbar,
-  Card,
-  Row,
-  Col,
-  Button,
-} from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import { addPlan } from "@/modules/Data";
 import Navigation from "@/components/Navigation";
 import Head from "next/head";
@@ -28,65 +17,10 @@ import Loader from "@/components/Loader";
 
 export default function PlansPage() {
   const [plans, setNewPlans] = useState([]);
-  const [planNames, setPlanNames] = useState([]);
-  const [spendingData, setSpendingData] = useState([]);
-  const [nameToSpendingData, setNameToSpendingData] = useState([]);
-  const [totalExpenditure, setTotalExpenditure] = useState(0);
-  const { isLoaded, userId, sessionId, getToken } = useAuth();
-  const [ isLoading, setIsLoading ] = useState(true);
-  const [ activation, setActivation ] = useState(false);
+  const { isLoaded, userId, getToken } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [activation, setActivation] = useState(false);
   const router = useRouter();
-
-  // useEffect(() => {
-  //   const getTotalExp = async (plan) => {
-  //     return await getToken({ template: "codehooks" }).then(async (token) => {
-  //       return await getSpecificPlannedExpenses(token, userId, plan._id).then((res) => {
-  //         let totalExp = 0;
-  //         const planNames = [];
-  //         const spendingData = [];
-  //         res.map((entry) => {
-  //           console.log("entry.amount: " + entry.amount);
-  //           console.log("entry.name: " + entry.name);
-  //           planNames.push(entry.name);
-  //           spendingData.push(entry.amount);
-  //           console.log(planNames);
-  //           console.log(spendingData);
-  //           totalExp += entry.amount;
-  //         });
-  //         console.log("total exp: " + totalExp);
-  //         return {
-  //           totalExp: totalExp.toFixed(2),
-  //           planNames: planNames,
-  //           spendingData: spendingData
-  //         };
-  //       });
-  //     });
-  //   }
-
-  //   getToken({ template: "codehooks" }).then(async (token) => {
-  //     const res = await getAllPlans(token, userId);
-  //     console.log("res1: " + res.length);
-  //     if (res.length > 0){
-  //       setNewPlans(await Promise.all(res.map(async (plan) => {
-  //         const { totalExp, planNames, spendingData } = await getTotalExp(plan);
-  //         console.log("we made it here with totalExp: " + totalExp);
-  //         return(
-  //           <Col xs={12} lg={4}>
-  //             <PlanCard
-  //               name={plan.name}
-  //               expenditure={totalExp}
-  //               labels={planNames}
-  //               spendingData={spendingData}
-  //               summaryData={"yeah and?"}
-  //               id={plan._id}
-  //               activeStatus={false}
-  //             />
-  //           </Col>
-  //         );
-  //       })));
-  //     }
-  //   });
-  // }, [router, isLoaded]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -98,8 +32,6 @@ export default function PlansPage() {
             let totalExp = 0;
             const nameToSpendingData = new Map();
             res.map((entry) => {
-              console.log("entry.amount: " + entry.amount);
-              console.log("entry.name: " + entry.name);
               if (nameToSpendingData.has(entry.name)) {
                 nameToSpendingData.set(
                   entry.name,
@@ -108,10 +40,10 @@ export default function PlansPage() {
               } else {
                 nameToSpendingData.set(entry.name, entry.amount);
               }
-              console.log(nameToSpendingData);
+
               totalExp += parseFloat(entry.amount);
             });
-            console.log("total exp: " + totalExp);
+
             setIsLoading(false);
             return {
               totalExp: parseFloat(totalExp).toFixed(2),
@@ -129,37 +61,37 @@ export default function PlansPage() {
       await activatePlan(token, userId, id);
       setActivation(false);
       setIsLoading(false);
-    }
+    };
 
     getToken({ template: "codehooks" }).then(async (token) => {
       const res = await getAllPlans(token, userId);
-      console.log("res1: " + res.length);
+
       if (res.length > 0) {
         setNewPlans(
           await Promise.all(
             res.map(async (plan) => {
               const { totalExp, nameToSpendingData } = await getTotalExp(plan);
-              console.log("we made it here with totalExp: " + totalExp);
+
               const planNames = Array.from(nameToSpendingData.keys());
               const spendingData = Array.from(nameToSpendingData.values());
-              if(plan.inProgress) {
+              if (plan.inProgress) {
                 await deletePlan(token, userId, plan._id);
-                return <></>
-              }
-              else return (
-                <Col xs={12} lg={4}>
-                  <PlanCard
-                    name={plan.name}
-                    expenditure={totalExp}
-                    labels={planNames}
-                    spendingData={spendingData}
-                    summaryData={"yeah and?"}
-                    id={plan._id}
-                    activeStatus={plan.isActive}
-                    activate={activate}
-                  />
-                </Col>
-              );
+                return <></>;
+              } else
+                return (
+                  <Col xs={12} lg={4}>
+                    <PlanCard
+                      name={plan.name}
+                      expenditure={totalExp}
+                      labels={planNames}
+                      spendingData={spendingData}
+                      summaryData={"yeah and?"}
+                      id={plan._id}
+                      activeStatus={plan.isActive}
+                      activate={activate}
+                    />
+                  </Col>
+                );
             })
           )
         );

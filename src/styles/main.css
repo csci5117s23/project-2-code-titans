@@ -1,17 +1,21 @@
-html, body{
+html,
+body {
   background-color: #FFB84E !important;
 
 }
-.white-color{
+
+.white-color {
   color: #F8F4F1 !important;
 }
-strong{
+
+strong {
   font-size: 32px;
 }
+
 .title {
   flex: 1;
   color: #472B00;
-  
+
 }
 
 .expenses {
@@ -23,33 +27,40 @@ strong{
   margin-left: 1rem;
   border-radius: 15px;
 }
+
 .main-button {
   background-color: rgba(71, 177, 237, 0.87) !important;
   border: rgba(71, 177, 237, 0.87) !important;
   width: 80%;
 }
+
 .chart-container {
   width: 100%;
   height: 200px;
 }
-.text-success{
+
+.text-success {
   color: #044303 !important;
 }
-.white-box-container{
+
+.white-box-container {
   border-bottom-left-radius: 48px !important;
   border-bottom-right-radius: 48px !important;
   background: #F8F4F1;
   box-shadow: 0px 4px 39px rgba(0, 0, 0, 0.15);
   width: 100%;
 }
+
 .btn-save {
   display: block;
   margin: 0 auto;
 }
-.light-brown{
+
+.light-brown {
   color: #876C44;
   font-size: 20px;
 }
+
 .custom-input {
   background: "#F7E7D5";
   border-radius: "11px";
@@ -59,27 +70,33 @@ strong{
   display: flex;
   flex-direction: row;
 }
+
 .loader {
   width: 65px;
   margin: auto;
 }
+
 .loader__image {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .loader__coin {
   animation: flip 0.5s ease-in-out infinite alternate-reverse both;
 }
+
 @keyframes flip {
   0% {
     transform: rotateY(0);
   }
+
   100% {
     transform: rotateY(-180deg);
   }
 }
-.loader-container{
+
+.loader-container {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -93,6 +110,7 @@ strong{
   font-size: 1.5rem;
   z-index: 1000000000;
 }
-.bar{
+
+.bar {
   width: 10px !important;
 }

@@ -1,39 +1,29 @@
 import React, { useState, useEffect, useId } from "react";
+import { useRouter } from "next/router";
 import { useAuth, useUser } from "@clerk/nextjs";
-import Link from "next/link";
-import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Container,
-  Nav,
-  Navbar,
-  Card,
-  Row,
-  Col,
-  Button,
-  Carousel,
-} from "react-bootstrap";
+import Head from "next/head";
+
 import { Bar, Doughnut } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Container, Card, Row, Col, Button, Carousel } from "react-bootstrap";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+
 import Navigation from "@/components/Navigation";
 import Loader from "@/components/Loader";
-import Head from "next/head";
-import { useRouter } from "next/router";
+
 import {
   getAllPlans,
   getAllActivePlans,
   getPastExpensesByDate,
-  getSinglePlannedExpense,
   getSpecificPlannedExpenses,
   addPastExpense,
 } from "@/modules/Data";
-import { useRef } from "react";
-import Chartjs from "chart.js";
 import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
 
 export default function HomePage() {
-  const { isLoaded, userId, sessionId, getToken } = useAuth();
-  const { user } = useUser();
+  const { isLoaded, userId, getToken } = useAuth();
   const router = useRouter();
   const [barGraphData, setBarGraphData] = useState([
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -41,13 +31,16 @@ export default function HomePage() {
   const [barGraphLoad, setBarGraphLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isBarGraphLoading, setIsBarGraphLoading] = useState(true);
-  const [barGraphRef, setBarGraphRef] = useState(useRef(null));
   const [plans, setNewPlans] = useState([]);
   const [currentMonthExpend, setCurrentMonthExpend] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState((new Date().getMonth() + 1).toLocaleString("en-US", {
-    minimumIntegerDigits: 2,
-    useGrouping: false,
-  }) + "-" + (new Date).getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(
+    (new Date().getMonth() + 1).toLocaleString("en-US", {
+      minimumIntegerDigits: 2,
+      useGrouping: false,
+    }) +
+      "-" +
+      new Date().getFullYear()
+  );
   const [barInfo, setBarInfo] = useState({
     type: "bar",
     data: {
@@ -157,7 +150,7 @@ export default function HomePage() {
         return await getSpecificPlannedExpenses(token, userId, plan._id).then(
           (res) => {
             let totalExp = 0;
-            console.log("Planned expenses: ", res);
+
             const nameToSpendingData = new Array();
             res.map((entry) => {
               const tempImgPath = "/" + entry.name.toLowerCase() + "Exp.png";
@@ -170,7 +163,7 @@ export default function HomePage() {
               }
               totalExp += parseFloat(entry.amount);
             });
-            console.log("total exp: " + totalExp);
+
             return {
               totalExp: parseFloat(totalExp).toFixed(2),
               nameToSpendingData: nameToSpendingData,
@@ -182,7 +175,7 @@ export default function HomePage() {
 
     getToken({ template: "codehooks" }).then(async (token) => {
       const res = await getAllPlans(token, userId);
-      console.log("res1: " + JSON.stringify(res));
+
       if (res.length > 0) {
         setNewPlans(
           await Promise.all(
@@ -196,22 +189,6 @@ export default function HomePage() {
       }
     });
   }, [router, isLoaded]);
-
-  const monthNumToName = {
-    "01": "January",
-    "02": "February",
-    "03": "March",
-    "04": "April",
-    "05": "May",
-    "06": "June",
-    "07": "July",
-    "08": "August",
-    "09": "September",
-    10: "October",
-    11: "November",
-    12: "December",
-  };
-
   // Register the scales
   Chart.register(...registerables);
 
@@ -245,14 +222,10 @@ export default function HomePage() {
             "-" +
             currentYear
         );
-        console.log("ithMonth: ");
-        console.log(ithMonth);
 
         if (!ithMonth || ithMonth.length == 0) {
           const activePlan = (await getAllActivePlans(token, userId))[0];
           if (activePlan) {
-            console.log("active plan: ");
-            console.log(activePlan);
             barGraphData[i - 1] = await getSpecificPlannedExpenses(
               token,
               userId,
@@ -279,21 +252,15 @@ export default function HomePage() {
                     expenseToken,
                     expenseData
                   );
-                  console.log("expense Data: ");
-                  console.log(expenseData);
-                  console.log("pastExpense: ");
-                  console.log(pastExpense);
+
                   return pastExpense;
                 })
               ).then((pastExpenses) => {
-                console.log("past Expenses: ");
-                console.log(pastExpenses);
                 return pastExpenses.reduce((acc, ith) => {
                   return acc + parseFloat(ith.amount);
                 }, 0);
               });
             });
-            console.log("data " + (i - 1) + " :" + barGraphData[i - 1]);
           } else barGraphData[i - 1] = 0;
         } else {
           barGraphData[i - 1] = ithMonth.reduce((acc, ith) => {
@@ -304,7 +271,6 @@ export default function HomePage() {
       }
       const token = await getToken({ template: "codehooks" });
       const activePlan = (await getAllActivePlans(token, userId))[0];
-      console.log(activePlan);
 
       const projectedCost = activePlan
         ? await getToken({ template: "codehooks" }).then(async (token) => {
@@ -313,8 +279,6 @@ export default function HomePage() {
               userId,
               activePlan._id
             ).then((res) => {
-              console.log("the res that errors: ");
-              console.log(res);
               return res.reduce((acc, entry) => {
                 return acc + parseFloat(entry.amount);
               }, 0);
@@ -327,7 +291,7 @@ export default function HomePage() {
 
       setBarGraphData(barGraphData);
       setCurrentMonthExpend(barGraphData[currentMonthNumeric - 1]);
-      console.log(barGraphData);
+
       setBarGraphLoad(false);
     };
     if (isLoaded && userId) checkPastMonths().then(setIsBarGraphLoading(false));
@@ -337,12 +301,8 @@ export default function HomePage() {
     let tempInfo = barInfo;
     tempInfo.data.datasets[0].data = barGraphData;
     setBarInfo(tempInfo);
-    console.log("tempInfo: ");
-    console.log(tempInfo);
   }, [barGraphData, barGraphLoad]);
-  useEffect(() => {
-    console.log("Bar Graph Loading Status: " + isBarGraphLoading);
-  }, [isBarGraphLoading]);
+  useEffect(() => {}, [isBarGraphLoading]);
 
   const donutoptions = {
     plugins: {
@@ -357,10 +317,9 @@ export default function HomePage() {
     async function process() {
       if (userId) {
         getToken({ template: "codehooks" }).then(async (token) => {
-          console.log("curr month", currentMonth);
           const res = await getPastExpensesByDate(token, userId, currentMonth);
           const currLabels = getUniqueNames(res);
-          console.log("pie chart val: ", res);
+
           setSummaryLabels(currLabels);
           setSummaryData(getSummaryData(currLabels, res));
           setMissingSummaryData(res.length < 1);
@@ -382,7 +341,6 @@ export default function HomePage() {
   };
   if (isLoaded && !userId) router.push("/");
   else {
-    console.log(barInfo.data);
     return (
       <>
         {(isLoading || isBarGraphLoading || barGraphLoad) && (
@@ -419,7 +377,7 @@ export default function HomePage() {
                   />
                 </div>
               </div>
-              <div className={`my-5 ${barGraphLoad ? 'bar' : ''}`}>
+              <div className={`my-5 ${barGraphLoad ? "bar" : ""}`}>
                 <Bar data={barInfo.data} options={barInfo.options} />
               </div>
             </Card.Body>
@@ -448,7 +406,15 @@ export default function HomePage() {
                         {
                           label: "Spending Summary",
                           data: summaryData,
-                          backgroundColor: Array.from({ length: 1000 }, () => `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.5)`),
+                          backgroundColor: Array.from(
+                            { length: 1000 },
+                            () =>
+                              `rgba(${Math.floor(
+                                Math.random() * 256
+                              )}, ${Math.floor(
+                                Math.random() * 256
+                              )}, ${Math.floor(Math.random() * 256)}, 0.5)`
+                          ),
                           borderWidth: 1,
                         },
                       ],

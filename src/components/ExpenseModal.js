@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Container, Row, Col, Form } from "react-bootstrap";
-import { getCarInfo, buyCarInFull, getCarLoanPayments, getHomePrice, getAptPrice, getSinglePlannedExpense } from "@/modules/Data";
-import { useRouter } from "next/router";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { getStateByZip, getLoanPayables, getTotalTaxRate, getCarMake, getCarPaidInFull, getValuableCarInfo, getCarPrice, getAvgHomeInsuranceCost } from '@/modules/utilsCost';
-import { data } from "jquery";
+import { useAuth } from "@clerk/nextjs";
+import {
+  getStateByZip,
+  getLoanPayables,
+  getTotalTaxRate,
+  getCarMake,
+  getCarPaidInFull,
+  getValuableCarInfo,
+  getCarPrice,
+  getAvgHomeInsuranceCost,
+} from "@/modules/utilsCost";
 
-
-const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location, editing, addExpense, editExpense, getSingleExpense, past  }) => {
-
-  const { isLoaded, userId, sessionId, getToken } = useAuth();
-  const { user } = useUser();
-  const router = useRouter();
+const ExpenseModal = ({
+  show,
+  expense,
+  handleClose,
+  expenseId,
+  planId,
+  location,
+  editing,
+  addExpense,
+  editExpense,
+  getSingleExpense,
+  past,
+}) => {
+  const { userId, getToken } = useAuth();
 
   const [name, setName] = useState(null);
   const [amount, setAmount] = useState(null);
@@ -36,43 +50,50 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
   }, [expense]);
 
   useEffect(() => {
-    if(expenseId && expenseId.length > 0){
-      console.log("expenseId: " + expenseId);
+    if (expenseId && expenseId.length > 0) {
       getToken({ template: "codehooks" }).then(async (token) => {
         async function process() {
-          const res =  (await getSingleExpense(token, userId, expenseId))[0];
+          const res = (await getSingleExpense(token, userId, expenseId))[0];
           return res;
         }
         process().then((res) => {
-          // console.log(res);
+          //
           setName(res.name);
           setAmount(res.amount);
           setDueDate(res.dueDate);
-          if(res.name == "Auto" && res.carVin){
+          if (res.name == "Auto" && res.carVin) {
             setVinOrPrice("VIN");
-            setCarInfo({year: res.carYear, make: res.carMark, model: res.carModel});
+            setCarInfo({
+              year: res.carYear,
+              make: res.carMark,
+              model: res.carModel,
+            });
           }
-          if(res.apr)
-            setAPR(res.apr);
-          if(res.term)
-            setTerm(res.term);
-          if(res.downpayment)
-            setDownpayment(res.downpayment);
+          if (res.apr) setAPR(res.apr);
+          if (res.term) setTerm(res.term);
+          if (res.downpayment) setDownpayment(res.downpayment);
         });
       });
     }
-  }, [expenseId])
+  }, [expenseId]);
 
   useEffect(() => {
     setZipCode(location);
-  }, [location])
+  }, [location]);
 
   const handleSaveChanges = async (e) => {
-    // Do something with the expense data
     e.preventDefault();
-    console.log(past);
-    if(!past && (name.trim()==="" || amount===null || amount===undefined || dueDate==="" || !amount)) return;
-    
+
+    if (
+      !past &&
+      (name.trim() === "" ||
+        amount === null ||
+        amount === undefined ||
+        dueDate === "" ||
+        !amount)
+    )
+      return;
+
     let savedChanges = {
       name: name,
       userId: userId,
@@ -80,36 +101,28 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
       planId: planId,
       dueDate: dueDate,
     };
-    if(past) savedChanges['date'] = planId;
-    if(carInfo){
-      savedChanges['carModel'] = carInfo.model;
-      savedChanges['carMake'] = carInfo.make;
-      savedChanges['carYear'] = carInfo.year;
+    if (past) savedChanges["date"] = planId;
+    if (carInfo) {
+      savedChanges["carModel"] = carInfo.model;
+      savedChanges["carMake"] = carInfo.make;
+      savedChanges["carYear"] = carInfo.year;
     }
-    if(vin)
-      savedChanges['carVin'] = vin;
-    if(APR)
-      savedChanges['apr'] = APR;
-    if(term)
-      savedChanges['term'] = term;
-    if(downpayment)
-      savedChanges['downpayment'] = downpayment;
-    if(editing && expenseId){
-      const token = await getToken({ template: "codehooks" })
-      console.log('expenseId: ' + expenseId);
-      console.log(savedChanges);
+    if (vin) savedChanges["carVin"] = vin;
+    if (APR) savedChanges["apr"] = APR;
+    if (term) savedChanges["term"] = term;
+    if (downpayment) savedChanges["downpayment"] = downpayment;
+    if (editing && expenseId) {
+      const token = await getToken({ template: "codehooks" });
+
       await editExpense(token, userId, expenseId, savedChanges).then(() => {
         handleClose();
       });
-      
-    }else{
-      const token = await getToken({ template: "codehooks" })
-      console.log("saved changes");
-      console.log(savedChanges)
+    } else {
+      const token = await getToken({ template: "codehooks" });
+
       await addExpense(token, savedChanges).then((res) => {
-        console.log(res);
         handleClose();
-      }); 
+      });
     }
   };
 
@@ -125,56 +138,55 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
 
   const handleLookup = async () => {
     const token = await getToken({ template: "codehooks" });
-    // const res = await getCarInfo(token, vin);
     getValuableCarInfo(vin).then((res) => {
-      console.log(res);
       setCustomAutoPrice(res.price);
       setCarInfo(res);
     });
-    // console.log("getValuableCarInfo reached");
-    
+    //
   };
 
   const handleComputeCarAPR = async () => {
-    console.log("Clicked!");
-    // const token = await getToken({ template: "codehooks" });
-    // const res = await getCarLoanPayments(token, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice) - downpayment, APR, term);
-    
-    getLoanPayables((vinOrPrice == "VIN" ? carInfo.price : customAutoPrice) - downpayment,APR,term,0,0).then((res) => setAmount(parseFloat(res)));
-    // setAmount(parseFloat(res));
+    getLoanPayables(
+      (vinOrPrice == "VIN" ? carInfo.price : customAutoPrice) - downpayment,
+      APR,
+      term,
+      0,
+      0
+    ).then((res) => setAmount(parseFloat(res)));
   };
 
-
-  const handleFullPaymentCar = async() => {
-    // const token = await getToken({ template: "codehooks" });
-    // const res = await buyCarInFull(token, zipCode, (vinOrPrice=="VIN" ? carInfo.price : customAutoPrice));
-    getTotalTaxRate(zipCode).then((tax) => setAmount(getCarPaidInFull(customAutoPrice,tax)));
+  const handleFullPaymentCar = async () => {
+    getTotalTaxRate(zipCode).then((tax) =>{
+      setAmount(getCarPaidInFull(customAutoPrice, tax))
+      console.log(amount);
+    }
+    );
     // setAmount (parseFloat(res));
   };
 
-  const handleOwnHomeCosts = async() => {
-    // const token = await getToken({ template: "codehooks" });
-    // const res = await getHomePrice(token, zipCode, homePrice - downpayment, APR, term);
+  const handleOwnHomeCosts = async () => {
     const state = await getStateByZip(zipCode);
-    getAvgHomeInsuranceCost(state).then((insurance) => {console.log(insurance);
-    getLoanPayables(homePrice,APR,term,parseFloat(insurance[0]) * homePrice,parseFloat(insurance[1]) * homePrice).then((res) => 
-    setAmount(parseFloat(res).toFixed(2)))});
-    // const loan = await getLoanPayables(amount,APR,term,insurance[0] * amount,insurance[1] * amount)
-    // setAmount(parseFloat(loan));
+    getAvgHomeInsuranceCost(state).then((insurance) => {
+      getLoanPayables(
+        homePrice,
+        APR,
+        term,
+        parseFloat(insurance[0]) * homePrice,
+        parseFloat(insurance[1]) * homePrice
+      ).then((res) => setAmount(parseFloat(res).toFixed(2)));
+    });
   };
 
-  const handleRentCosts = async() => {
-    // const token = await getToken({ template: "codehooks" });
-    // const res = await getAptPrice(token, zipCode, rent);
-    console.log(await getStateByZip(zipCode));
+  const handleRentCosts = async () => {
     const state = await getStateByZip(zipCode);
-    console.log(rent);
-    getAvgHomeInsuranceCost(state).then((insurance) => {console.log(insurance[2]);
-    getLoanPayables(rent * 12,0.1,1,parseFloat(insurance[2]),0).then((res) => 
-    setAmount(parseFloat(res).toFixed(2)))});
-    // setAmount(parseFloat(res));
+
+    getAvgHomeInsuranceCost(state).then((insurance) => {
+      getLoanPayables(rent * 12, 0.1, 1, parseFloat(insurance[2]), 0).then(
+        (res) => setAmount(parseFloat(res).toFixed(2))
+      );
+    });
   };
-  
+
   const renderAutoFields = () => {
     return (
       <div>
@@ -225,7 +237,12 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
               <Form.Label>
                 <span className="light-brown">Year</span>
               </Form.Label>
-              <Form.Control className="custom-input" type="text" value={carInfo.year} disabled />
+              <Form.Control
+                className="custom-input"
+                type="text"
+                value={carInfo.year}
+                disabled
+              />
             </Form.Group>
             <Form.Group controlId="model">
               <Form.Label>
@@ -338,22 +355,27 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
                 backgroundColor: "#47B1ED",
                 boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
                 width: "fit-content",
-                border: "none"
+                border: "none",
               }}
               className="my-3"
               variant="primary"
               type="submit"
-              onClick={handleComputeCarAPR}>
+              onClick={handleComputeCarAPR}
+            >
               Compute Costs
             </Button>
           </>
         )}
-        {financeOrFull ===
-          "Full" && (
-            <Button className="my-3" type="submit" variant="primary" onClick={handleFullPaymentCar}>
-              Compute Costs
-            </Button>
-          )}
+        {financeOrFull === "Full" && (
+          <Button
+            className="my-3"
+            type="submit"
+            variant="primary"
+            onClick={handleFullPaymentCar}
+          >
+            Compute Costs
+          </Button>
+        )}
       </div>
     );
   };
@@ -384,7 +406,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
         </Form.Group>
         {rentOrOwn === "Own" && (
           <>
-              <Form.Group controlId="cost">
+            <Form.Group controlId="cost">
               <Form.Label>
                 <span className="light-brown">Home Price ($)</span>
               </Form.Label>
@@ -434,21 +456,23 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
               </div>
             </Form.Group>
             <Button
-              style={{backgroundColor: "#47B1ED",
-                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                      width: "fit-content",
-                      border: "none"}}
+              style={{
+                backgroundColor: "#47B1ED",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                width: "fit-content",
+                border: "none",
+              }}
               className="my-3"
               variant="primary"
               type="submit"
-              onClick={handleOwnHomeCosts}>
+              onClick={handleOwnHomeCosts}
+            >
               Compute Costs
             </Button>
           </>
         )}
-        {rentOrOwn ===
-          "Rent" && (
-            <>
+        {rentOrOwn === "Rent" && (
+          <>
             <Form.Group controlId="cost">
               <Form.Label>
                 <span className="light-brown">Monthly Rent ($)</span>
@@ -461,22 +485,24 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
               />
             </Form.Group>
             <Button
-              style={{backgroundColor: "#47B1ED",
-                      boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
-                      width: "fit-content",
-                      border: "none"}}
+              style={{
+                backgroundColor: "#47B1ED",
+                boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+                width: "fit-content",
+                border: "none",
+              }}
               className="my-3"
               variant="primary"
               type="submit"
-              onClick={handleRentCosts}>
+              onClick={handleRentCosts}
+            >
               Compute Costs
             </Button>
-            </>
-          )}
+          </>
+        )}
       </div>
     );
   };
-
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -502,7 +528,7 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
                     }}
                     value={name}
                     onChange={(e) => {
-                      setName(e.target.value)
+                      setName(e.target.value);
                     }}
                     disabled={isDisabled}
                     required
@@ -563,10 +589,11 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
             style={{
               boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
               width: "fit-content",
-              border: "none"
+              border: "none",
             }}
             variant="secondary"
-            onClick={handleClose}>
+            onClick={handleClose}
+          >
             Close
           </Button>
           <Button
@@ -574,11 +601,12 @@ const ExpenseModal = ({ show, expense, handleClose, expenseId, planId, location,
               backgroundColor: "#47B1ED",
               boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
               width: "fit-content",
-              border: "none"
+              border: "none",
             }}
             variant="primary"
             type="submit"
-            onClick={handleSaveChanges}>
+            onClick={handleSaveChanges}
+          >
             {editing ? "Save Edit" : "Create Expense"}
           </Button>
         </Modal.Footer>

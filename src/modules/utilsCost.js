@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState} from "react";
 import { useAuth } from '@clerk/nextjs';
 
-const apiNinjaKey = 'VUqM8pOYRSUXDglRoav+Vg==EuvtIuMkwpPN0t9r';
+const apiNinjaKey = process.env.NEXT_PUBLIC_API_NINJAS_KEY;
 
 export default function CostCalculator(){
     const [loanAmt,setLoanAmt] = useState("Click to get your loan amount!");
@@ -26,68 +26,7 @@ export default function CostCalculator(){
 
     const { isLoaded, userId, isSignedIn, getToken } = useAuth();
 
-    // useEffect(() => {}, [isLoaded,state]);
-
-    
-
-    // return (
-    //     <>
-    //         <h3>Enter your zipcode to find the state</h3>
-    //         <textarea placeholder="Enter 5 digit zipcode" onChange={(e) => setZipcode(e.target.value)}></textarea>
-    //         <button onClick={async () => getStateOfZipCode(zipcode)}>{state}</button>
-    //         <h3>House Loan amount payable per month:</h3><br></br>
-    //         <textarea placeholder="Enter your house loan amount" onChange={(e) => setPrincipal(e.target.value)}></textarea>
-    //         <textarea placeholder="Enter the (%) interest rate on your loan" onChange={(e) => setIntRate(e.target.value)}></textarea>
-    //         <textarea placeholder="Enter the duration of the loan period" onChange={(e) => setLoanDuration(e.target.value)}></textarea>
-    //         <button onClick={async () => getValues(principal,intRate,loanDuration,avgHomeInsuranceCost * principal,curPropertyTax * principal)}>{loanAmt}</button>
-    //         <h3>Rent amount payable per month:</h3>
-    //         <textarea placeholder="Enter monthly rent payment" onChange={(e) => setRentAmount(e.target.value)}></textarea>
-    //         <button onClick={async () => getValues(rentAmount * 12,0.1,1,avgRentersInsurance,0)}>{loanAmt}</button>
-    //         <h3>Total tax Rate for your zip code:</h3>
-    //         <button onClick={getZipTax}>{taxRate}</button>
-    //         <h3>Get Car Make:</h3>
-    //         <textarea placeholder="Enter your VIN" onChange={(e) => getCarManufacturer(e.target.value)}></textarea>
-    //         <h5>{carMake}</h5>
-    //         <h3>Get Car Price:</h3>
-    //         <button onClick={async () => {getCarPriceEstimate(carMake,carYear,carModel)}}>{carPrice}</button>
-    //     </>
-    // );
 }
-
-    
-
-    // async function getCarModel(VIN){
-    //     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
-    //     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
-    //     return response;
-    // }
-
-// This is to get the city tax rate
-// async function getCityTaxRate(zip){
-//     const api_url = `https://api.api-ninjas.com/v1/salestax?zip_code=${zip}`;
-//     const response = await fetch(api_url, {headers: {
-//         "X-Api-Key": apiNinjaKey
-//       }}).then(response => response.json()).then(data => {console.log("Data[0].city_rate: "); console.log(data[0].city_rate); return data[0].city_rate;}).catch(error => console.error(error));
-//     return response;
-// }
-
-
-
-//Getting the year the car was made (i.e. 2015, 2022 etc.)
-
-
-
-
-// async function getCarModel(VIN){
-//     const api_url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${VIN}?format=json`;
-//     const response = await fetch(api_url).then(response => response.json()).then(data => {console.log("data.Results[9].Value"); console.log(data.Results[9].Value); return data.Results[9].Value;}).catch(error => console.error(error));
-//     return response;
-// }
-// 
-// async function buyCarInFull(price,tax){
-//     const response = getTotalTaxRate(req.query.zip).then((tax) => {return getCarPaidInFull(req.query.price,tax)});
-//     res.send((await response).toString());
-// }
 
 export async function getValues(principal,intRate,loanDuration,avgHomeInsurance,propertyTax){
     console.log("getValues function reached");
@@ -97,12 +36,10 @@ export async function getValues(principal,intRate,loanDuration,avgHomeInsurance,
 
 export async function getZipTax(){
     console.log("getZipTax function reached");
-    // setLoanAmt(calcCost.getLoanPayables(200000,3.5,30));
     setTaxRate(await getTotalTaxRate(55414));
     return taxRate;
 }
 
-// Yennodu VIN L5YZCABP1N1146187
 export async function getCarManufacturer(VIN){
     console.log("getCarManufacturer function reached");
     setCarVIN(VIN);
@@ -123,9 +60,6 @@ export async function getStateOfZipCode(zip){
             setState(derState);
         });
     })
-    // const res = (await getAvgHomeInsuranceCost(state)).then((data) => {setAvgHomeInsuranceCost(data[0]); setCurPropertyTax(data[1]);});
-    // setAvgHomeInsuranceCost(res[0]);
-    // setCurPropertyTax(res[1]);
     
     return state;
 }
@@ -172,7 +106,8 @@ export async function getTotalTaxRate(zip){
     const api_url = `https://api.api-ninjas.com/v1/salestax?zip_code=${zip}`;
     const response = await fetch(api_url, {headers: {
         "X-Api-Key": apiNinjaKey
-    }}).then(response => response.json()).then(data => {console.log("Data[0].total_rate: "); console.log(data[0].total_rate); return data[0].total_rate;}).catch(error => console.error(error));
+    }}).then(response => response.json()).then(data => {console.log("Data[0].total_rate: ", apiNinjaKey); console.log(data[0].total_rate); return data[0].total_rate;}).catch(error => console.error(error));
+    console.log(response);
     return response;
 }
 
@@ -181,7 +116,7 @@ export async function getCarMake(VIN){
     const api_url = `https://api.api-ninjas.com/v1/vinlookup?vin=${VIN}`;
     const response = await fetch(api_url, {headers: {
         "X-Api-Key": apiNinjaKey
-    }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: "); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
+    }}).then(response => response.json()).then(data => {console.log("Data.manufacturer: ", apiNinjaKey); console.log(data.manufacturer); return data.manufacturer;}).catch(error => console.error(error));
     return response;
 }
 

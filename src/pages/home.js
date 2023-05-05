@@ -44,7 +44,10 @@ export default function HomePage() {
   const [barGraphRef, setBarGraphRef] = useState(useRef(null));
   const [plans, setNewPlans] = useState([]);
   const [currentMonthExpend, setCurrentMonthExpend] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState([]);
+  const [currentMonth, setCurrentMonth] = useState((new Date().getMonth() + 1).toLocaleString("en-US", {
+    minimumIntegerDigits: 2,
+    useGrouping: false,
+  }) + "-" + (new Date).getFullYear());
   const [barInfo, setBarInfo] = useState({
     type: "bar",
     data: {
@@ -144,9 +147,9 @@ export default function HomePage() {
       maintainAspectRatio: false,
     },
   });
-  const [summaryLabels,setSummaryLabels] = useState([]);
-  const [summaryData,setSummaryData] = useState([]);
-  const [missingSummaryData,setMissingSummaryData] = useState(true);
+  const [summaryLabels, setSummaryLabels] = useState([]);
+  const [summaryData, setSummaryData] = useState([]);
+  const [missingSummaryData, setMissingSummaryData] = useState(true);
 
   useEffect(() => {
     const getTotalExp = async (plan) => {
@@ -159,8 +162,10 @@ export default function HomePage() {
             res.map((entry) => {
               const tempImgPath = "/" + entry.name.toLowerCase() + "Exp.png";
               if (!nameToSpendingData.includes(tempImgPath)) {
-                nameToSpendingData.push(tempImgPath.includes("auto") || tempImgPath.includes("home") ?
-                  "/" + entry.name.toLowerCase() + "Exp.png" : "/otherExp.png"
+                nameToSpendingData.push(
+                  tempImgPath.includes("auto") || tempImgPath.includes("home")
+                    ? "/" + entry.name.toLowerCase() + "Exp.png"
+                    : "/otherExp.png"
                 );
               }
               totalExp += parseFloat(entry.amount);
@@ -202,9 +207,9 @@ export default function HomePage() {
     "07": "July",
     "08": "August",
     "09": "September",
-    "10": "October",
-    "11": "November",
-    "12": "December",
+    10: "October",
+    11: "November",
+    12: "December",
   };
 
   // Register the scales
@@ -220,10 +225,14 @@ export default function HomePage() {
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
       const currentMonthNumeric = currentDate.getMonth() + 1;
-      setCurrentMonth((currentDate.getMonth() + 1).toLocaleString(
-        "en-US",
-        { minimumIntegerDigits: 2, useGrouping: false }
-      )+"-"+currentYear);
+      setCurrentMonth(
+        (currentDate.getMonth() + 1).toLocaleString("en-US", {
+          minimumIntegerDigits: 2,
+          useGrouping: false,
+        }) +
+          "-" +
+          currentYear
+      );
       for (let i = 1; i <= currentMonthNumeric; i++) {
         const token = await getToken({ template: "codehooks" });
         let ithMonth = await getPastExpensesByDate(
@@ -241,7 +250,7 @@ export default function HomePage() {
 
         if (!ithMonth || ithMonth.length == 0) {
           const activePlan = (await getAllActivePlans(token, userId))[0];
-          if (activePlan){
+          if (activePlan) {
             console.log("active plan: ");
             console.log(activePlan);
             barGraphData[i - 1] = await getSpecificPlannedExpenses(
@@ -251,18 +260,26 @@ export default function HomePage() {
             ).then(async (res) => {
               return Promise.all(
                 res.map(async (expense) => {
-                  const expenseToken = await getToken({ template: "codehooks" });
+                  const expenseToken = await getToken({
+                    template: "codehooks",
+                  });
                   const expenseData = {
                     name: expense.name,
                     userId: userId,
                     amount: expense.amount,
-                    date: (i).toLocaleString(
-                      "en-US",
-                      { minimumIntegerDigits: 2, useGrouping: false }
-                    )+"-"+currentYear
+                    date:
+                      i.toLocaleString("en-US", {
+                        minimumIntegerDigits: 2,
+                        useGrouping: false,
+                      }) +
+                      "-" +
+                      currentYear,
                   };
-                  const pastExpense = await addPastExpense(expenseToken, expenseData);
-                  console.log("expense Data: ")
+                  const pastExpense = await addPastExpense(
+                    expenseToken,
+                    expenseData
+                  );
+                  console.log("expense Data: ");
                   console.log(expenseData);
                   console.log("pastExpense: ");
                   console.log(pastExpense);
@@ -274,26 +291,23 @@ export default function HomePage() {
                 return pastExpenses.reduce((acc, ith) => {
                   return acc + parseFloat(ith.amount);
                 }, 0);
-              })
-              
+              });
             });
             console.log("data " + (i - 1) + " :" + barGraphData[i - 1]);
-          }
-          else barGraphData[i - 1] = 0;
-        }else{
+          } else barGraphData[i - 1] = 0;
+        } else {
           barGraphData[i - 1] = ithMonth.reduce((acc, ith) => {
             return acc + parseFloat(ith.amount);
           }, 0);
         }
         setBarGraphData(barGraphData);
-
       }
       const token = await getToken({ template: "codehooks" });
       const activePlan = (await getAllActivePlans(token, userId))[0];
       console.log(activePlan);
 
       const projectedCost = activePlan
-        ? (await getToken({ template: "codehooks" }).then(async (token) => {
+        ? await getToken({ template: "codehooks" }).then(async (token) => {
             return await getSpecificPlannedExpenses(
               token,
               userId,
@@ -305,19 +319,18 @@ export default function HomePage() {
                 return acc + parseFloat(entry.amount);
               }, 0);
             });
-          }))
+          })
         : 0;
       for (let i = currentMonthNumeric + 1; i <= 12; i++) {
         barGraphData[i - 1] = projectedCost;
       }
-      
+
       setBarGraphData(barGraphData);
       setCurrentMonthExpend(barGraphData[currentMonthNumeric - 1]);
       console.log(barGraphData);
       setBarGraphLoad(false);
     };
-    if(isLoaded && userId)
-      checkPastMonths().then(setIsBarGraphLoading(false));
+    if (isLoaded && userId) checkPastMonths().then(setIsBarGraphLoading(false));
   }, [barGraphLoad, isLoaded, userId]);
 
   useEffect(() => {
@@ -327,25 +340,9 @@ export default function HomePage() {
     console.log("tempInfo: ");
     console.log(tempInfo);
   }, [barGraphData, barGraphLoad]);
-
-  const donutdata = {
-    labels: ["Food", "Utilities", "Rent", "Auto", "Entertainment", "Other"],
-    datasets: [
-      {
-        label: "Spending Summary",
-        data: [20, 10, 30, 15, 5, 20],
-        backgroundColor: [
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#FF8A80",
-          "#B2FF59",
-          "#D7CCC8",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  useEffect(() => {
+    console.log("Bar Graph Loading Status: " + isBarGraphLoading);
+  }, [isBarGraphLoading]);
 
   const donutoptions = {
     plugins: {
@@ -357,23 +354,22 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    getToken({ template: "codehooks" }).then(async (token) => {
-      async function process() {
-        if(userId) {
-          const res = await getPastExpensesByDate(token,userId,currentMonth);
-          return res;
-        }
-        return [];
+    async function process() {
+      if (userId) {
+        getToken({ template: "codehooks" }).then(async (token) => {
+          console.log("curr month", currentMonth);
+          const res = await getPastExpensesByDate(token, userId, currentMonth);
+          const currLabels = getUniqueNames(res);
+          console.log("pie chart val: ", res);
+          setSummaryLabels(currLabels);
+          setSummaryData(getSummaryData(currLabels, res));
+          setMissingSummaryData(res.length < 1);
+        });
       }
-      
-      process().then((res) => {
-        const currLabels = getUniqueNames(res)
-        setSummaryLabels(currLabels);
-        setSummaryData(getSummaryData(currLabels,res));
-        setMissingSummaryData(res.length < 1);
-      })
-    })
-  },[isLoaded])
+    }
+
+    process();
+  }, [isLoaded]);
 
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -384,29 +380,12 @@ export default function HomePage() {
   const handleNextClick = () => {
     setActiveIndex(activeIndex === plans.length - 1 ? 0 : activeIndex + 1);
   };
-
-  if (isLoading)
-    return (
-      <>
-        <div className="loader-container">
-          <Loader />
-        </div>
-      </>
-    );
-  if (isBarGraphLoading)
-    return (
-      <>
-        <div className="loader-container">
-          <Loader />
-        </div>
-      </>
-    );
-  else if (isLoaded && !userId) router.push("/");
+  if (isLoaded && !userId) router.push("/");
   else {
     console.log(barInfo.data);
     return (
       <>
-        {isLoading && (
+        {(isLoading || isBarGraphLoading || barGraphLoad) && (
           <div className="loader-container">
             <Loader />
           </div>
@@ -426,8 +405,18 @@ export default function HomePage() {
                   <h1>Monthly Expenditure</h1>
                 </div>
                 <div className="expenses d-flex ml-auto">
-                  <h1 className="text-success mr-3">$ {currentMonthExpend.toString().split('').join('\u200A'.repeat(2))}</h1>
-                  <img src="/addExpenseBox.png" alt="Expenses" onClick={() => router.push("/summary/" + currentMonth)} />
+                  <h1 className="text-success mr-3">
+                    ${" "}
+                    {currentMonthExpend
+                      .toString()
+                      .split("")
+                      .join("\u200A".repeat(2))}
+                  </h1>
+                  <img
+                    src="/addExpenseBox.png"
+                    alt="Expenses"
+                    onClick={() => router.push("/summary/" + currentMonth)}
+                  />
                 </div>
               </div>
               <div className="my-5">
@@ -471,7 +460,8 @@ export default function HomePage() {
                         },
                       ],
                     }}
-                    options={donutoptions} />
+                    options={donutoptions}
+                  />
                 )}
               </div>
             </Card.Body>
@@ -506,7 +496,6 @@ export default function HomePage() {
                                       width="75px"
                                       height="75px"
                                       src={imgPath}
-                                    
                                     />
                                   </div>
                                 );

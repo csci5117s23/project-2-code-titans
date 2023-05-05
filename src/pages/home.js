@@ -419,7 +419,7 @@ export default function HomePage() {
                   />
                 </div>
               </div>
-              <div className="my-5">
+              <div className={`my-5 ${barGraphLoad ? 'bar' : ''}`}>
                 <Bar data={barInfo.data} options={barInfo.options} />
               </div>
             </Card.Body>

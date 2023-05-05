@@ -93,3 +93,6 @@ strong{
   font-size: 1.5rem;
   z-index: 1000000000;
 }
+.bar{
+  width: 10px !important;
+}

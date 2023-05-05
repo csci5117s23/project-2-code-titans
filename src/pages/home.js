@@ -40,6 +40,7 @@ export default function HomePage() {
   ]);
   const [barGraphLoad, setBarGraphLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBarGraphLoading, setIsBarGraphLoading] = useState(true);
   const [barGraphRef, setBarGraphRef] = useState(useRef(null));
   const [plans, setNewPlans] = useState([]);
   const [currentMonthExpend, setCurrentMonthExpend] = useState([]);
@@ -214,6 +215,8 @@ export default function HomePage() {
   }, [isLoaded]);
   useEffect(() => {
     const checkPastMonths = async () => {
+      setIsBarGraphLoading(true);
+
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
       const currentMonthNumeric = currentDate.getMonth() + 1;
@@ -314,7 +317,7 @@ export default function HomePage() {
       setBarGraphLoad(false);
     };
     if(isLoaded && userId)
-      checkPastMonths();
+      checkPastMonths().then(setIsBarGraphLoading(false));
   }, [barGraphLoad, isLoaded, userId]);
 
   useEffect(() => {
@@ -382,7 +385,15 @@ export default function HomePage() {
     setActiveIndex(activeIndex === plans.length - 1 ? 0 : activeIndex + 1);
   };
 
-  if (!isLoaded)
+  if (isLoading)
+    return (
+      <>
+        <div className="loader-container">
+          <Loader />
+        </div>
+      </>
+    );
+  if (isBarGraphLoading)
     return (
       <>
         <div className="loader-container">

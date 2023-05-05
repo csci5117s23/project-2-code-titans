@@ -29,7 +29,7 @@ import {
 } from "@/modules/Data";
 import { useRef } from "react";
 import Chartjs from "chart.js";
-// import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
+import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -148,7 +148,6 @@ export default function HomePage() {
   const [missingSummaryData,setMissingSummaryData] = useState(true);
 
   useEffect(() => {
-    
     const getTotalExp = async (plan) => {
       return await getToken({ template: "codehooks" }).then(async (token) => {
         return await getSpecificPlannedExpenses(token, userId, plan._id).then(
@@ -158,10 +157,11 @@ export default function HomePage() {
             const nameToSpendingData = new Array();
             res.map((entry) => {
               const tempImgPath = "/" + entry.name.toLowerCase() + "Exp.png";
-              if (!nameToSpendingData.includes(tempImgPath))
-                nameToSpendingData.push(
-                  "/" + entry.name.toLowerCase() + "Exp.png"
+              if (!nameToSpendingData.includes(tempImgPath)) {
+                nameToSpendingData.push(tempImgPath.includes("auto") || tempImgPath.includes("home") ?
+                  "/" + entry.name.toLowerCase() + "Exp.png" : "/otherExp.png"
                 );
+              }
               totalExp += parseFloat(entry.amount);
             });
             console.log("total exp: " + totalExp);
@@ -173,7 +173,7 @@ export default function HomePage() {
         );
       });
     };
-    setIsLoading(true);
+
     getToken({ template: "codehooks" }).then(async (token) => {
       const res = await getAllPlans(token, userId);
       console.log("res1: " + JSON.stringify(res));
@@ -189,7 +189,6 @@ export default function HomePage() {
         );
       }
     });
-    setIsLoading(false);
   }, [router, isLoaded]);
 
   const monthNumToName = {
@@ -209,9 +208,12 @@ export default function HomePage() {
 
   // Register the scales
   Chart.register(...registerables);
+
+  useEffect(() => {
+    setIsLoading(!isLoaded);
+  }, [isLoaded]);
   useEffect(() => {
     const checkPastMonths = async () => {
-      setIsLoading(true);
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
       const currentMonthNumeric = currentDate.getMonth() + 1;
@@ -281,7 +283,7 @@ export default function HomePage() {
           }, 0);
         }
         setBarGraphData(barGraphData);
-        
+
       }
       const token = await getToken({ template: "codehooks" });
       const activePlan = (await getAllActivePlans(token, userId))[0];
@@ -312,17 +314,15 @@ export default function HomePage() {
       setBarGraphLoad(false);
     };
     if(isLoaded && userId)
-      checkPastMonths().then(setIsLoading(false));
+      checkPastMonths();
   }, [barGraphLoad, isLoaded, userId]);
 
   useEffect(() => {
-    setIsLoading(true);
     let tempInfo = barInfo;
     tempInfo.data.datasets[0].data = barGraphData;
     setBarInfo(tempInfo);
     console.log("tempInfo: ");
     console.log(tempInfo);
-    setIsLoading(false);
   }, [barGraphData, barGraphLoad]);
 
   const donutdata = {
@@ -352,25 +352,25 @@ export default function HomePage() {
     },
     maintainAspectRatio: false,
   };
-  //dont touch
-  // useEffect(() => {
-  //   getToken({ template: "codehooks" }).then(async (token) => {
-  //     async function process() {
-  //       if(userId) {
-  //         const res = await getPastExpensesByDate(token,userId,currentMonth);
-  //         return res;
-  //       }
-  //       return [];
-  //     }
+
+  useEffect(() => {
+    getToken({ template: "codehooks" }).then(async (token) => {
+      async function process() {
+        if(userId) {
+          const res = await getPastExpensesByDate(token,userId,currentMonth);
+          return res;
+        }
+        return [];
+      }
       
-  //     process().then((res) => {
-  //       console.log("Checking somethign: " + res);
-  //       const currLabels = getUniqueNames(res)
-  //       setSummaryLabels(currLabels);
-  //       setSummaryLabels(getSummaryData(currLabels,res));
-  //     })
-  //   })
-  // },[isLoaded])
+      process().then((res) => {
+        const currLabels = getUniqueNames(res)
+        setSummaryLabels(currLabels);
+        setSummaryData(getSummaryData(currLabels,res));
+        setMissingSummaryData(res.length < 1);
+      })
+    })
+  },[isLoaded])
 
   const [activeIndex, setActiveIndex] = useState(0);
 

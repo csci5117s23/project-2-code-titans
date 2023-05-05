@@ -18,7 +18,7 @@ export function getSummaryData(labels,data) {
 
     const rtnData = [];
     labels.map((label) => {
-        rtnData.push(val[label]);
+        rtnData.push(nameToData[label]);
     })
 
     return rtnData;

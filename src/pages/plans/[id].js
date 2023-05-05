@@ -291,7 +291,7 @@ export default function NewPlanPage() {
                         }}
                       />
                       <div className="input-group-append">
-                        <span onClick={findMe} className="input-group-text">
+                        <span onClick={findMe} className="input-group-text bg-info" style={{cursor: "pointer", userSelect: "none"}}>
                           Find me!
                         </span>
                       </div>

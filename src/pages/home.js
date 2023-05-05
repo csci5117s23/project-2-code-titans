@@ -383,7 +383,7 @@ export default function HomePage() {
     setActiveIndex(activeIndex === plans.length - 1 ? 0 : activeIndex + 1);
   };
 
-  if (!isLoading)
+  if (isLoading)
     return (
       <>
         <div className="loader-container">
@@ -391,7 +391,7 @@ export default function HomePage() {
         </div>
       </>
     );
-  if (!isBarGraphLoading)
+  if (isBarGraphLoading)
     return (
       <>
         <div className="loader-container">

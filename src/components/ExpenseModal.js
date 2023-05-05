@@ -161,7 +161,6 @@ const ExpenseModal = ({
       console.log(amount);
     }
     );
-    // setAmount (parseFloat(res));
   };
 
   const handleOwnHomeCosts = async () => {

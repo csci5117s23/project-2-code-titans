@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useId } from "react";
 import { useRouter } from "next/router";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 import Head from "next/head";
 
 import { Bar, Doughnut } from "react-chartjs-2";
@@ -147,6 +147,7 @@ export default function HomePage() {
   useEffect(() => {
     const getTotalExp = async (plan) => {
       return await getToken({ template: "codehooks" }).then(async (token) => {
+        console.log("token: ", token)
         return await getSpecificPlannedExpenses(token, userId, plan._id).then(
           (res) => {
             let totalExp = 0;

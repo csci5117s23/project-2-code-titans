@@ -79,7 +79,7 @@ export default function PlansPage() {
                 return <></>;
               } else
                 return (
-                  <Col xs={12} lg={4}>
+                  <Col xs={12} lg={6} xxl={4}>
                     <PlanCard
                       name={plan.name}
                       expenditure={totalExp}

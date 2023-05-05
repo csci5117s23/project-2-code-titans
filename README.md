@@ -65,14 +65,22 @@ The set new plan Page allows users to set up a new personal budget plan. The use
 
 ## Screenshots of Mobile Version (complete)
 
+#### The Home Page as seen through iOS
 ![Home Page](ss/mobile1.jpeg)
+#### The bottom of the Home Page as seen through iOS
 ![Home Page Bottom](ss/mobile2.jpeg)
+#### The Loader
 ![Loader](ss/mobile3.jpeg)
+#### The Plan Page as seen through iOS
 ![Plan Page](ss/mobile4.jpeg)
+#### The Edit Plan Page as seen through iOS
 ![Edit Plan](ss/mobile5.jpeg)
+#### The Add Plan Page as seen through iOS
 ![Add Plna](ss/mobile6.jpeg)
-![In iOS](ss/mobile9.jpg)
-![In iOS Multitasking](ss/mobile8.jpg)
+#### The Downloaded "App" in native iOS
+![In iOS](ss/mobile9.jpeg)
+#### The "App" in Multitasking on iOS
+![In iOS Multitasking](ss/mobile8.jpge)
 
 #### Compare Plans Page
 The compare plans page will greet the user with a few pre-made budget plan suggestions, but will also allow them to create and customize a plan unique to them depending on their specific preferences.

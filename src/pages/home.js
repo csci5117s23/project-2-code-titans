@@ -375,6 +375,7 @@ export default function HomePage() {
                     src="/addExpenseBox.png"
                     alt="Expenses"
                     onClick={() => router.push("/summary/" + currentMonth)}
+                    style={{cursor: "pointer", userSelect: "none", webkitUserDrag: "none", userDrag: "none"}}
                   />
                 </div>
               </div>

@@ -66,6 +66,36 @@ const userAuth = async (req, res, next) => {
 };
 app.use(userAuth);
 
+app.use('/plans', (req, res, next) => {
+  if (req.method === "POST") {
+      req.body.userId = req.user_token.sub;
+      req.body._id = undefined;
+  } else if (req.method === "GET") {
+      req.query.userId = req.user_token.sub;
+  }
+  next();
+});
+
+app.use('/plannedExpenses', (req, res, next) => {
+  if (req.method === "POST") {
+      req.body.userId = req.user_token.sub;
+      req.body._id = undefined;
+  } else if (req.method === "GET") {
+      req.query.userId = req.user_token.sub;
+  }
+  next();
+});
+
+app.use('/pastExpenses', (req, res, next) => {
+  if (req.method === "POST") {
+      req.body.userId = req.user_token.sub;
+      req.body._id = undefined;
+  } else if (req.method === "GET") {
+      req.query.userId = req.user_token.sub;
+  }
+  next();
+});
+
 app.get("/getState", async (req, res) => {
   const response = await getStateByZip(req.query.zip);
   res.send(response.toString());
@@ -159,38 +189,50 @@ app.get("/calculateCarPrice", async (req, res) => {
 
 app.delete("/deletePlan", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.removeOne("plans", req.query._id);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.removeOne("plans", req.query._id);
+    res.json(data);
+  } else res.send(403);
 });
 
 app.delete("/deletePlanned", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.removeOne("plannedExpenses", req.query._id);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.removeOne("plannedExpenses", req.query._id);
+    res.json(data);
+  } else res.send(403);
 });
 
 app.delete("/deletePast", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.removeOne("pastExpenses", req.query._id);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.removeOne("pastExpenses", req.query._id);
+    res.json(data);
+  } else res.send(403);
 });
 
 app.put("/updatePlan", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.updateOne("plans", req.query._id, req.body);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.updateOne("plans", req.query._id, req.body);
+    res.json(data);
+  } else res.send(403);
 });
 
 app.put("/updatePlannedExpense", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.updateOne("plannedExpenses", req.query._id, req.body);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.updateOne("plannedExpenses", req.query._id, req.body);
+    res.json(data);
+  } else res.send(403);
 });
 
 app.put("/updatePastExpense", async (req, res) => {
   const db = await Datastore.open();
-  const data = await db.updateOne("pastExpenses", req.query._id, req.body);
-  res.json(data);
+  if(req.query.userId==req.user_token.sub) {
+    const data = await db.updateOne("pastExpenses", req.query._id, req.body);
+    res.json(data);
+  } else res.send(403);
 });
 
 // Use Crudlify to create a REST API for any collection

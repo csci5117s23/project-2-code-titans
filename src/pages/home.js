@@ -448,14 +448,7 @@ export default function HomePage() {
                         {
                           label: "Spending Summary",
                           data: summaryData,
-                          backgroundColor: [
-                            "#FF6384",
-                            "#36A2EB",
-                            "#FFCE56",
-                            "#FF8A80",
-                            "#B2FF59",
-                            "#D7CCC8",
-                          ],
+                          backgroundColor: Array.from({ length: 1000 }, () => `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.5)`),
                           borderWidth: 1,
                         },
                       ],

@@ -435,6 +435,7 @@ export default function HomePage() {
             interval={null}
             slide={2} // Set number of cards displayed to 2
             controls={false}
+            indicators={false}
           >
             {plans.reduce((acc, plan, index) => {
               if (index % 2 === 0) {

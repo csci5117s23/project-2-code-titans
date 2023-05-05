@@ -39,8 +39,7 @@ Which (if any) progressive web app feature(s) does your app support?
 
 ### Low-Fidelity Diagram
 ![Low-Fidelity Diagram](mockups/low-fidelity.png)
-
-**Todo**
+Here is a low-fidelity version of our project that we created for reference. We are not bound to this design but this may provide some guidance for us as we design our project.
 
 ### High-Fidelity Diagram
 ![High-Fidelity Diagram](mockups/high-fidelity.png)
@@ -55,9 +54,6 @@ Here is a high-fidelity version of our project that we also created for referenc
 
 
 ## Screenshots of Site (complete)
-
-**[Add a screenshot of each key page](https://stackoverflow.com/questions/10189356/how-to-add-screenshot-to-readmes-in-github-repository)
-along with a very brief caption:**
 
 #### Home Page
 The home page highlights the user's Monthly Expenditure, Spending Summary and any spending plans that the user might be following, also allowing them to navigate to each of these pages easily.
@@ -77,13 +73,6 @@ The compare plans page will greet the user with a few pre-made budget plan sugge
 **Document integrations with 3rd Party code or services here.
 Please do not document required libraries (e.g., Vue, Vuefire, Firebase).**
 
-* GCP: For Car API data storage
 * Api Ninjas API- API to get Car, Location , Sales and Mortgage Tax information
 * NHTSA API - API for car lookup and more specific auto information
 * next-pwa: For installing a PWA
-
-**If there's anything else you would like to disclose about how your project
-relied on external code, expertise, or anything else, please disclose that
-here:**
-
-...

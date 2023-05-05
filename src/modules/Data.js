@@ -215,6 +215,7 @@ export async function deletePlannedExpense(
       },
     }
   );
+  console.log(result);
   return await result.json();
 }
 

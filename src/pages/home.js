@@ -29,7 +29,7 @@ import {
 } from "@/modules/Data";
 import { useRef } from "react";
 import Chartjs from "chart.js";
-// import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
+import { getSummaryData, getUniqueNames } from "@/modules/UtilsCharts";
 
 export default function HomePage() {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -40,6 +40,7 @@ export default function HomePage() {
   ]);
   const [barGraphLoad, setBarGraphLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBarGraphLoading, setIsBarGraphLoading] = useState(true);
   const [barGraphRef, setBarGraphRef] = useState(useRef(null));
   const [plans, setNewPlans] = useState([]);
   const [currentMonthExpend, setCurrentMonthExpend] = useState([]);
@@ -211,7 +212,7 @@ export default function HomePage() {
   Chart.register(...registerables);
   useEffect(() => {
     const checkPastMonths = async () => {
-      setIsLoading(true);
+      setIsBarGraphLoading(true);
       const currentDate = new Date();
       const currentYear = currentDate.getFullYear();
       const currentMonthNumeric = currentDate.getMonth() + 1;
@@ -312,7 +313,7 @@ export default function HomePage() {
       setBarGraphLoad(false);
     };
     if(isLoaded && userId)
-      checkPastMonths().then(setIsLoading(false));
+      checkPastMonths().then(setIsBarGraphLoading(false));
   }, [barGraphLoad, isLoaded, userId]);
 
   useEffect(() => {
@@ -352,25 +353,25 @@ export default function HomePage() {
     },
     maintainAspectRatio: false,
   };
-  //dont touch
-  // useEffect(() => {
-  //   getToken({ template: "codehooks" }).then(async (token) => {
-  //     async function process() {
-  //       if(userId) {
-  //         const res = await getPastExpensesByDate(token,userId,currentMonth);
-  //         return res;
-  //       }
-  //       return [];
-  //     }
+
+  useEffect(() => {
+    getToken({ template: "codehooks" }).then(async (token) => {
+      async function process() {
+        if(userId) {
+          const res = await getPastExpensesByDate(token,userId,currentMonth);
+          return res;
+        }
+        return [];
+      }
       
-  //     process().then((res) => {
-  //       console.log("Checking somethign: " + res);
-  //       const currLabels = getUniqueNames(res)
-  //       setSummaryLabels(currLabels);
-  //       setSummaryLabels(getSummaryData(currLabels,res));
-  //     })
-  //   })
-  // },[isLoaded])
+      process().then((res) => {
+        console.log("Checking somethign: " + res);
+        const currLabels = getUniqueNames(res)
+        setSummaryLabels(currLabels);
+        setSummaryLabels(getSummaryData(currLabels,res));
+      })
+    })
+  },[isLoaded])
 
   const [activeIndex, setActiveIndex] = useState(0);
 

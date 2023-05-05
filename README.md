@@ -63,6 +63,17 @@ The home page highlights the user's Monthly Expenditure, Spending Summary and an
 The set new plan Page allows users to set up a new personal budget plan. The user can input income, location, expenses, and a descriptive name of this plan.
 ![Set New Plan](mockups/SetNewPlan.jpg)
 
+## Screenshots of Mobile Version (complete)
+
+![Home Page](ss/mobile1.jpeg)
+![Home Page Bottom](ss/mobile2.jpeg)
+![Loader](ss/mobile3.jpeg)
+![Plan Page](ss/mobile4.jpeg)
+![Edit Plan](ss/mobile5.jpeg)
+![Add Plna](ss/mobile6.jpeg)
+![In iOS](ss/mobile9.jpg)
+![In iOS Multitasking](ss/mobile8.jpg)
+
 #### Compare Plans Page
 The compare plans page will greet the user with a few pre-made budget plan suggestions, but will also allow them to create and customize a plan unique to them depending on their specific preferences.
 ![Compare Plans](mockups/ComparePlans.jpg)
